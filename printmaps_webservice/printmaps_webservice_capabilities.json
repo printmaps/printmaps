@@ -1,0 +1,84 @@
+{
+    "ConfigMapdata": {
+        "Description": "europe",
+        "MinLatitude": 9999.9,
+        "MaxLatitude": 9999.9,
+        "MinLongitude": 9999.9,
+        "MaxLongitude": 9999.9
+    },
+    "ConfigMapformats": [
+        {
+            "Type": "png",
+            "MinPrintWidth": 5.0,
+            "MaxPrintWidth": 2500.0,
+            "MinPrintHeigth": 5.0,
+            "MaxPrintHeigth": 2500.0
+        }
+    ],
+    "ConfigMapscale": {
+        "MinScale": 100,
+        "MaxScale": 200000
+    },
+    "ConfigStyles": [
+        {
+            "Name": "osm-carto",
+            "ShortDescription": "OpenStreetMap Carto Style",
+            "LongDescription": "The 'OpenStreetMap Carto' map design is the standard style rendered at the OSM webpage.",
+            "Release": "4.2.0",
+            "Date": "2017/08/25",
+            "Link": "https://github.com/gravitystorm/openstreetmap-carto",
+            "Copyright": "© OpenStreetMap contributors",
+            "Layers": "world,coast-poly,builtup,necountries,landcover-low-zoom,landcover,landcover-line,water-lines-casing,water-lines-low-zoom,icesheet-poly,water-areas,landcover-area-symbols,icesheet-outlines,water-lines,water-barriers-line,water-barriers-poly,marinas-area,piers-poly,piers-line,water-barriers-point,bridge,buildings,buildings-major,tunnels,landuse-overlay,line-barriers,cliffs,area-barriers,ferry-routes,turning-circle-casing,highway-area-casing,roads-casing,highway-area-fill,roads-fill,turning-circle-fill,aerialways,roads-low-zoom,waterway-bridges,bridges,guideways,admin-low-zoom,admin-mid-zoom,admin-high-zoom,power-minorline,power-line,nature-reserve-boundaries,tourism-boundary,trees,country-names,capital-names,state-names,placenames-medium,placenames-small,stations,stations-poly,amenity-points-poly,amenity-points,power-towers,power-poles,roads-text-ref-low-zoom,junctions,bridge-text,roads-text-ref,roads-area-text-name,roads-text-name,paths-text-name,railways-text-name,text-poly-low-zoom,text-poly,text-line,text-point,building-text,interpolation,addresses,water-lines-text,ferry-routes-text,admin-text,nature-reserve-text,amenity-low-priority,amenity-low-priority-poly"
+        },
+        {
+            "Name": "osm-carto-mono",
+            "ShortDescription": "OpenStreetMap Carto Monochrome Style",
+            "LongDescription": "The 'OpenStreetMap Carto Monochrome' map design only renders (calculated) monochrome shades. The style is intended to be used as background.",
+            "Release": "4.2.0",
+            "Date": "2017/08/25",
+            "Link": "https://github.com/gravitystorm/openstreetmap-carto",
+            "Copyright": "© OpenStreetMap contributors",
+            "Layers": "world,coast-poly,builtup,necountries,landcover-low-zoom,landcover,landcover-line,water-lines-casing,water-lines-low-zoom,icesheet-poly,water-areas,landcover-area-symbols,icesheet-outlines,water-lines,water-barriers-line,water-barriers-poly,marinas-area,piers-poly,piers-line,water-barriers-point,bridge,buildings,buildings-major,tunnels,landuse-overlay,line-barriers,cliffs,area-barriers,ferry-routes,turning-circle-casing,highway-area-casing,roads-casing,highway-area-fill,roads-fill,turning-circle-fill,aerialways,roads-low-zoom,waterway-bridges,bridges,guideways,admin-low-zoom,admin-mid-zoom,admin-high-zoom,power-minorline,power-line,nature-reserve-boundaries,tourism-boundary,trees,country-names,capital-names,state-names,placenames-medium,placenames-small,stations,stations-poly,amenity-points-poly,amenity-points,power-towers,power-poles,roads-text-ref-low-zoom,junctions,bridge-text,roads-text-ref,roads-area-text-name,roads-text-name,paths-text-name,railways-text-name,text-poly-low-zoom,text-poly,text-line,text-point,building-text,interpolation,addresses,water-lines-text,ferry-routes-text,admin-text,nature-reserve-text,amenity-low-priority,amenity-low-priority-poly"
+        },
+        {
+            "Name": "osm-carto-ele20",
+            "ShortDescription": "OpenStreetMap Carto Elevation Style (20 m)",
+            "LongDescription": "The 'OpenStreetMap Carto Elevation' map design adds elevation (contour) lines with an equidistance of 20 meters to the default osm-carto style.",
+            "Release": "4.2.0",
+            "Date": "2017/08/25",
+            "Link": "https://github.com/gravitystorm/openstreetmap-carto",
+            "Copyright": "© OpenStreetMap contributors, © U.S. Geological Survey, © J. de Ferranti",
+            "Layers": "world,coast-poly,builtup,necountries,landcover-low-zoom,landcover,landcover-line,water-lines-casing,water-lines-low-zoom,icesheet-poly,water-areas,landcover-area-symbols,icesheet-outlines,water-lines,water-barriers-line,water-barriers-poly,marinas-area,piers-poly,piers-line,water-barriers-point,bridge,buildings,buildings-major,tunnels,landuse-overlay,contours,line-barriers,cliffs,area-barriers,ferry-routes,turning-circle-casing,highway-area-casing,roads-casing,highway-area-fill,roads-fill,turning-circle-fill,aerialways,roads-low-zoom,waterway-bridges,bridges,guideways,admin-low-zoom,admin-mid-zoom,admin-high-zoom,power-minorline,power-line,nature-reserve-boundaries,tourism-boundary,trees,country-names,capital-names,state-names,placenames-medium,placenames-small,stations,stations-poly,amenity-points-poly,amenity-points,power-towers,power-poles,roads-text-ref-low-zoom,junctions,bridge-text,roads-text-ref,roads-area-text-name,roads-text-name,paths-text-name,railways-text-name,text-poly-low-zoom,text-poly,text-line,text-point,building-text,interpolation,addresses,water-lines-text,ferry-routes-text,admin-text,nature-reserve-text,amenity-low-priority,amenity-low-priority-poly"
+        },
+        {
+            "Name": "schwarzplan",
+            "ShortDescription": "Figure Ground Plan (buildings)",
+            "LongDescription": "The 'Figure Ground Plan' map design renders only buildings.",
+            "Release": "1.1.0",
+            "Date": "2017/06/06",
+            "Link": "http://geo.dianacht.de/",
+            "Copyright": "© OpenStreetMap contributors",
+            "Layers": "buildings"
+        },
+        {
+            "Name": "schwarzplan+",
+            "ShortDescription": "Figure Ground Plan Plus (buildings, water areas, highways)",
+            "LongDescription": "The 'Figure Ground Plan Plus' map design renders only buildings, water areas and highways (as wire).",
+            "Release": "1.2.0",
+            "Date": "2017/08/25",
+            "Link": "http://freizeitkarte-osm.de/",
+            "Copyright": "© OpenStreetMap contributors",
+            "Layers": "coast-poly,waterarea,buildings,highways"
+        },
+        {
+            "Name": "raster10",
+            "ShortDescription": "Map canvas divided into a 10x10 raster",
+            "LongDescription": "Technical map (no database interaction) to verify the placement and styling of user map elements.",
+            "Release": "1.0.0",
+            "Date": "2017/05/14",
+            "Link": "http://freizeitkarte-osm.de/",
+            "Copyright": "Public Domain",
+            "Layers": "raster10"
+        }
+    ]
+}

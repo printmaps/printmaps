@@ -1,0 +1,58 @@
+# printmaps build service configuration
+# 1.9.0 - 2017/08/26
+
+# log file of this application
+logfile: printmaps_buildservice.log
+
+# working directory of this application 
+# must be same as configured for printmaps webservice
+workdir: ./
+
+# max number of parallel build processes
+# a scale of 1:200000 consumes a lot of database input/output
+# consider / verify the worst case scenario for your settings
+maxprocs: 2
+
+# shutdown grace period in seconds
+# let running build processes came to an end before forcing the shutdown
+graceperiod: 600
+
+# log simple build metrics
+metrics: false
+
+# run buildservice in test mode
+# purpose: for error analysis only
+# - does not delete temporary directories or files
+# - logs the output of all external program calls
+# set this to false for production
+testmode: false
+
+# driver for mapnik map generation (special version for printmaps project required)
+mapnikdriver: python /home/kto/Nik4/nik4-printmaps.py
+
+# path to directory with the default map marker icons 
+markersdir: /home/kto/printstyles/markers
+
+# map styles
+# name = map name (same as in webservice config)
+# xmlpath = path to mapnik xml file
+# xmlfile = mapnik xml file
+styles:
+- name: osm-carto
+  xmlpath: /home/kto/printstyles/osm-carto-4.2.0
+  xmlfile: mapnik.xml
+- name: osm-carto-mono
+  xmlpath: /home/kto/printstyles/osm-carto-mono-4.2.0
+  xmlfile: mapnik.xml
+- name: osm-carto-ele20
+  xmlpath: /home/kto/printstyles/osm-carto-ele20-4.2.0
+  xmlfile: mapnik.xml
+- name: schwarzplan
+  xmlpath: /home/kto/printstyles/schwarzplan-1.1.0
+  xmlfile: mapnik.xml
+- name: schwarzplan+
+  xmlpath: /home/kto/printstyles/schwarzplan+-1.2.0
+  xmlfile: mapnik.xml
+- name: raster10
+  xmlpath: /home/kto/printstyles/raster10-1.0.0
+  xmlfile: mapnik.xml

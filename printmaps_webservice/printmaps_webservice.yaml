@@ -1,0 +1,26 @@
+# printmaps webservice configuration
+# 1.1.0 - 2017/06/08
+
+# log file of this application
+logfile: printmaps_webservice.log
+
+# working directory of this application
+# must be the same as configured for the build service
+workdir: ./
+
+# TCP network address
+addr: :8181
+
+# capa file (json format) describing the capabilities of this service
+capafile: printmaps_webservice_capabilities.json
+
+# poly file (osmosis poly format) describing the area (polygon) with map data
+polyfile: europe.poly
+
+# maintenance file (html format) describing the maintenance case
+maintenancefile: printmaps_webservice_maintenance.html
+
+# run webservice in maintenance mode
+# server responses to each request with status 503 (Service Unavailable) and the maintenance file
+# set to false for production
+maintenancemode: false

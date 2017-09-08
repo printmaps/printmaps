@@ -1,0 +1,14 @@
+# printmaps purger configuration
+# 1.0.0 - 2017/05/27
+
+# log file of this application
+logfile: printmaps_purger.log
+
+# base map directory
+# - removes all outdated subdirs of the base dir
+# - effects only subdirs with uuid4 naming schema 
+# - double check the correctness of the path !
+mapdir: /home/kto/printmaps/maps
+
+# time of maturity (in hours, e.g. 168)
+maturity: 168

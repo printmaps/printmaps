@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate" viewBox="0 0 200 200" width="200" height="200">
+   <pattern id="hatch" width="20" height="20" patternTransform="rotate(135 0 0)" patternUnits="userSpaceOnUse">
+     <line x1="0" y1="0" x2="0" y2="20" style="stroke:#776EB8; stroke-width:10"/>
+   </pattern>
+   <rect x="0" y="0" width="100%" height="100%" fill="url(#hatch)"/>
+</svg>
