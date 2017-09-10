@@ -118,9 +118,10 @@ Desweiteren ist in der Kartenkonfiguration (map.yaml für den CLI-Client) die UR
 
 ---
 
+## Web-Applikation
 Für Printmaps steht mit dem CLI-Client eine vollumfängliche kommandozeilenorientierte Bedienoberfläche zur Verfügung.
 Wünschenswert wäre eine zusätzliche grafische Benutzeroberfläche in Form einer Web-Applikation.
-Möglicherweise ist jemand interessiert etwas in diese Richtung zu entwickeln und zu veröffentlichen.
+Möglicherweise ist jemand interessiert etwas in dieser Richtung zu entwickeln und zu veröffentlichen (gerne in diesem Repository).
 Hier einige Ideen dazu:
 
 Grundsätzlich:
