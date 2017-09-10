@@ -118,4 +118,35 @@ Desweiteren ist in der Kartenkonfiguration (map.yaml für den CLI-Client) die UR
 
 ---
 
+Für Printmaps steht mit dem CLI-Client eine vollumfängliche kommandozeilenorientierte Bedienoberfläche zur Verfügung.
+Wünschenswert wäre eine zusätzliche grafische Benutzeroberfläche in Form einer Web-Applikation.
+Möglicherweise ist jemand interessiert etwas in diese Richtung zu entwickeln und zu veröffentlichen.
+Hier einige Ideen dazu:
+
+Grundsätzlich:
+* die Web-Applikation sollte sich auf HTML5 und JavaScript beschränken
+* die Web-Applikation (GUI) sollte keine Serverkomponenten benötigen
+* Kartendefinitionen (map.yaml) sollten lokal gespeichert werden können
+
+Oberfläche:
+* Menüpunkte: Überblick, Daten, Karte, Aktion, Hilfe, Impressum
+* Überblick: allgemeine Erläuterungen (Zweck, Nutzung, ...)
+* Daten:
+    * Kartendefinition gemäß map.yaml
+	* Laden und Speichern möglich
+* Karte:
+    * Anzeigen des definierten Kartenausschnittes
+    * Verschieben des Kartenausschnittes möglich
+* Aktion:
+    * order, state, download
+    * upload, create, etc. automatisch im Hintergrund
+* Hilfe: Erläuterung und Details zur Funktionsweise
+* Impressum: Impressum
+
+Anmerkungen:
+* Die von der Weboberfläche erzeugte Kartendefinitionsdatei "map.yaml" sollte auch vom CLI-Client verwendet werden können und umgekehrt.
+* Die Datei "map.id" ist ebenfalls zu speichern und zu laden.
+
+---
+
 to be done - english translation
