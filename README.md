@@ -17,6 +17,9 @@ Printmaps kann genutzt werden
 
 ![](sample1.png)
 
+## Funktionsweise
+Der Benutzer definiert zunächst lokal eine Printmaps-Steuerdatei (map.yaml), die anschließend unter einer eindeutigen ID serverseitig gespeichert wird. Die Steuerdatei legt fest, wie die zu rendernde Karte aussehen soll. Hierbei kann der Benutzer die Karte um individuellle Objekte (Benutzerdaten) ergänzen. Für die Interaktion mit dem Benutzer ist der Webservice zuständig. Die eigentliche Erzeugung der Karte übernimmt der Buildservice. Der Buildservice generiert aus der Printmaps-Steuerdatei eine individuelle Mapnik-Steuerdatei (mapnik.xml). Hierbei wird die Mapnik-Steuerdatei um die Vorschriften zur Darstellung der Karten- und Benutzerzusatzelemente ergänzt. Anschließend wird die Karte durch das Programm Mapnik (via Nik4) erzeugt. Der Buildservice läuft dabei unabhängig vom Webservice. Über den Webservice hat der Benutzer jedoch die Möglichkeit, den jeweils aktuellen Buildstatus zu erfragen. Ist die Karte fertig gerendert, kann sie via Webservice herunter geladen werden.
+
 ## Status
 Printmaps befindet sich aktuell im Status "Beta 1".
 
@@ -118,9 +121,9 @@ Desweiteren ist in der Kartenkonfiguration (map.yaml für den CLI-Client) die UR
 
 ---
 
-## Web-Applikation
+## (Browser-) Web-Applikation
 Für Printmaps steht mit dem CLI-Client eine vollumfängliche kommandozeilenorientierte Bedienoberfläche zur Verfügung.
-Wünschenswert wäre eine zusätzliche grafische Benutzeroberfläche in Form einer Web-Applikation.
+Wünschenswert wäre eine zusätzliche grafische Benutzeroberfläche in Form einer (Browser-) Web-Applikation.
 Möglicherweise ist jemand interessiert etwas in dieser Richtung zu entwickeln und zu veröffentlichen (gerne in diesem Repository).
 Hier einige Ideen dazu:
 
