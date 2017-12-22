@@ -1,5 +1,5 @@
 # printmaps build service configuration
-# 1.9.0 - 2017/08/26
+# 1.10.0 - 2017/12/22
 
 # log file of this application
 logfile: printmaps_buildservice.log
@@ -39,19 +39,19 @@ markersdir: /home/kto/printstyles/markers
 # xmlfile = mapnik xml file
 styles:
 - name: osm-carto
-  xmlpath: /home/kto/printstyles/osm-carto-4.2.0
+  xmlpath: /home/kto/printstyles/osm-carto-4.6.0
   xmlfile: mapnik.xml
 - name: osm-carto-mono
-  xmlpath: /home/kto/printstyles/osm-carto-mono-4.2.0
+  xmlpath: /home/kto/printstyles/osm-carto-mono-4.6.0
   xmlfile: mapnik.xml
 - name: osm-carto-ele20
-  xmlpath: /home/kto/printstyles/osm-carto-ele20-4.2.0
+  xmlpath: /home/kto/printstyles/osm-carto-ele20-4.6.0
   xmlfile: mapnik.xml
 - name: schwarzplan
   xmlpath: /home/kto/printstyles/schwarzplan-1.1.0
   xmlfile: mapnik.xml
 - name: schwarzplan+
-  xmlpath: /home/kto/printstyles/schwarzplan+-1.2.0
+  xmlpath: /home/kto/printstyles/schwarzplan+-1.3.0
   xmlfile: mapnik.xml
 - name: raster10
   xmlpath: /home/kto/printstyles/raster10-1.0.0
