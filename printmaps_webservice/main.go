@@ -9,6 +9,7 @@ Releases:
 - 0.1.0 - 2017/05/23 : beta 1
 - 0.1.1 - 2017/05/26 : improvements
 - 0.1.2 - 2017/07/04 : problem with upload filename fixed
+- 0.2.0 - 2018/04/22 : support for full planet implemented
 
 Author:
 - Klaus Tockloth
@@ -128,8 +129,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.1.2"
-	progDate    = "2017/07/04"
+	progVersion = "0.2.0"
+	progDate    = "2018/04/22"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -259,21 +260,32 @@ func main() {
 	// create 'maps' and 'orders' directory (if necessary)
 	createDirectories()
 
-	// read poly file (describing the area with map data) and determine the bounding box
-	if err := readPolyfile(config.Polyfile, &pPolygon); err != nil {
-		log.Fatalf("fatal error <%v> at readPolyfile(), file = <%v>", err, config.Polyfile)
+	// full planet osm data (world) : config.Polyfile empty
+	if config.Polyfile != "" {
+		// read poly file (describing the area with map data) and determine the bounding box
+		if err := readPolyfile(config.Polyfile, &pPolygon); err != nil {
+			log.Fatalf("fatal error <%v> at readPolyfile(), file = <%v>", err, config.Polyfile)
+		}
+		pPolygonBoundingBox = pip.GetBoundingBox(pPolygon)
 	}
-	pPolygonBoundingBox = pip.GetBoundingBox(pPolygon)
 
 	// read capabilities file (describing the features of this service)
 	if err := readCapafile(config.Capafile, &pmFeature); err != nil {
 		log.Fatalf("fatal error <%v> at readCapafile(), file = <%v>", err, config.Capafile)
 	}
-	// modify lat/lon values
-	pmFeature.ConfigMapdata.MinLatitude = pPolygonBoundingBox.BottomLeft.Y
-	pmFeature.ConfigMapdata.MaxLatitude = pPolygonBoundingBox.TopRight.Y
-	pmFeature.ConfigMapdata.MinLongitude = pPolygonBoundingBox.BottomLeft.X
-	pmFeature.ConfigMapdata.MaxLongitude = pPolygonBoundingBox.TopRight.X
+
+	if config.Polyfile != "" {
+		// modify lat/lon values
+		pmFeature.ConfigMapdata.MinLatitude = pPolygonBoundingBox.BottomLeft.Y
+		pmFeature.ConfigMapdata.MaxLatitude = pPolygonBoundingBox.TopRight.Y
+		pmFeature.ConfigMapdata.MinLongitude = pPolygonBoundingBox.BottomLeft.X
+		pmFeature.ConfigMapdata.MaxLongitude = pPolygonBoundingBox.TopRight.X
+	}
+
+	log.Printf("MinLatitude = %f", pmFeature.ConfigMapdata.MinLatitude)
+	log.Printf("MaxLatitude = %f", pmFeature.ConfigMapdata.MaxLatitude)
+	log.Printf("MinLongitude = %f", pmFeature.ConfigMapdata.MinLongitude)
+	log.Printf("MaxLongitude = %f", pmFeature.ConfigMapdata.MaxLongitude)
 
 	router := httprouter.New()
 

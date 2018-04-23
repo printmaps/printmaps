@@ -105,28 +105,36 @@ func verifyMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
 		}
 	}
 	if pmData.Data.Attributes.Latitude != 0.0 {
-		latMin := pPolygonBoundingBox.BottomLeft.Y
-		latMax := pPolygonBoundingBox.TopRight.Y
+		// latMin := pPolygonBoundingBox.BottomLeft.Y
+		// latMax := pPolygonBoundingBox.TopRight.Y
+		latMin := pmFeature.ConfigMapdata.MinLatitude
+		latMax := pmFeature.ConfigMapdata.MaxLatitude
 		if pmData.Data.Attributes.Latitude < latMin || pmData.Data.Attributes.Latitude > latMax {
 			message = fmt.Sprintf("valid values: %.2f ... %.2f", latMin, latMax)
 			appendError(pmErrorList, "3006", message, pmData.Data.ID)
 		}
 	}
 	if pmData.Data.Attributes.Longitude != 0.0 {
-		lonMin := pPolygonBoundingBox.BottomLeft.X
-		lonMax := pPolygonBoundingBox.TopRight.X
+		// lonMin := pPolygonBoundingBox.BottomLeft.X
+		// lonMax := pPolygonBoundingBox.TopRight.X
+		lonMin := pmFeature.ConfigMapdata.MinLongitude
+		lonMax := pmFeature.ConfigMapdata.MaxLongitude
 		if pmData.Data.Attributes.Longitude < lonMin || pmData.Data.Attributes.Longitude > lonMax {
 			message = fmt.Sprintf("valid values: %.2f ... %.2f", lonMin, lonMax)
 			appendError(pmErrorList, "3007", message, pmData.Data.ID)
 		}
 	}
-	if pmData.Data.Attributes.Latitude != 0.0 || pmData.Data.Attributes.Longitude != 0.0 {
-		var pP pip.Point
-		pP.X = pmData.Data.Attributes.Longitude
-		pP.Y = pmData.Data.Attributes.Latitude
-		found = pip.PointInPolygon(pP, pPolygon)
-		if found == false {
-			appendError(pmErrorList, "3013", "no data available for the center position of the map", pmData.Data.ID)
+
+	// full planet osm data (world) : config.Polyfile empty
+	if config.Polyfile != "" {
+		if pmData.Data.Attributes.Latitude != 0.0 || pmData.Data.Attributes.Longitude != 0.0 {
+			var pP pip.Point
+			pP.X = pmData.Data.Attributes.Longitude
+			pP.Y = pmData.Data.Attributes.Latitude
+			found = pip.PointInPolygon(pP, pPolygon)
+			if found == false {
+				appendError(pmErrorList, "3013", "no data available for the center position of the map", pmData.Data.ID)
+			}
 		}
 	}
 }

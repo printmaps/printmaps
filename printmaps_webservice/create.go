@@ -36,7 +36,14 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 
 	if len(pmErrorList.Errors) == 0 {
 		// request ok, response with (new) ID and data, persist data
-		pmData.Data.ID = uuid.NewV4().String()
+		universallyUniqueIdentifier, err := uuid.NewV4()
+		if err != nil {
+			message := fmt.Sprintf("error <%v> at uuid.NewV4()", err)
+			http.Error(writer, message, http.StatusInternalServerError)
+			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
+			return
+		}
+		pmData.Data.ID = universallyUniqueIdentifier.String()
 
 		if err := writeMetadata(pmData); err != nil {
 			message := fmt.Sprintf("error <%v> at writeMetadata()", err)

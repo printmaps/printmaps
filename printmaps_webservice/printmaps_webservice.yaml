@@ -1,5 +1,5 @@
 # printmaps webservice configuration
-# 1.1.0 - 2017/06/08
+# 1.2.0 - 2018/04/22
 
 # log file of this application
 logfile: printmaps_webservice.log
@@ -15,7 +15,8 @@ addr: :8181
 capafile: printmaps_webservice_capabilities.json
 
 # poly file (osmosis poly format) describing the area (polygon) with map data
-polyfile: europe.poly
+# full planet osm data (world) = config.Polyfile empty
+polyfile:
 
 # maintenance file (html format) describing the maintenance case
 maintenancefile: printmaps_webservice_maintenance.html
