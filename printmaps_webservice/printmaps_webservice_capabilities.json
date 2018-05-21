@@ -47,7 +47,7 @@
             "Release": "4.9.0",
             "Date": "2018/03/23",
             "Link": "https://github.com/gravitystorm/openstreetmap-carto",
-            "Copyright": "© OpenStreetMap contributors, © U.S. Geological Survey, © J. de Ferranti",
+            "Copyright": "© OpenStreetMap contributors, © opensnowmap.org (based on ASTER GDEM, SRTM, EU-DEM)",
             "Layers": "world,coast-poly,necountries,landcover-low-zoom,landcover,landcover-line,water-lines-casing,water-lines-low-zoom,icesheet-poly,water-areas,landcover-area-symbols,icesheet-outlines,water-lines,water-barriers-line,water-barriers-poly,marinas-area,piers-poly,piers-line,water-barriers-point,bridge,buildings,buildings-major,tunnels,landuse-overlay,contours,tourism-boundary,line-barriers,cliffs,area-barriers,ferry-routes,turning-circle-casing,highway-area-casing,roads-casing,highway-area-fill,roads-fill,turning-circle-fill,aerialways,roads-low-zoom,waterway-bridges,bridges,guideways,entrances,aeroways,admin-low-zoom,admin-mid-zoom,admin-high-zoom,power-minorline,power-line,nature-reserve-boundaries,trees,country-names,capital-names,state-names,placenames-medium,placenames-small,stations,stations-poly,amenity-points-poly,amenity-line,amenity-points,power-towers,power-poles,roads-text-ref-low-zoom,junctions,bridge-text,roads-text-ref,roads-area-text-name,roads-text-name,paths-text-name,railways-text-name,text-poly-low-zoom,text-poly,text-line,text-point,building-text,interpolation,addresses,water-lines-text,ferry-routes-text,admin-text,nature-reserve-text,amenity-low-priority,amenity-low-priority-poly"
         },
         {
