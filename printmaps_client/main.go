@@ -12,12 +12,13 @@ Releases:
 - 0.1.3 - 2017/06/01 : textual corrections
 - 0.1.4 - 2017/06/27 : template modified
 - 0.1.5 - 2017/07/04 : problem with upload filepath fixed
+- 0.2.0 - 2018/10/24 : new helper 'coordgrid'
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017 Klaus Tockloth
+- Copyright (c) 2017,2018 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -63,14 +64,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/geojson"
 	yaml "gopkg.in/yaml.v2"
 )
 
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.1.5"
-	progDate    = "2017/07/04"
+	progVersion = "0.2.0"
+	progDate    = "2018/10/24"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -184,6 +187,8 @@ func main() {
 		template()
 	} else if action == "rectangle" {
 		rectangle()
+	} else if action == "coordgrid" {
+		coordgrid()
 	} else {
 		fmt.Printf("action <%v> not supported\n", action)
 	}
@@ -235,7 +240,7 @@ func printUsage() {
 	fmt.Printf("\nActions:\n")
 	fmt.Printf("  Primary   : create, update, upload, order, state, download\n")
 	fmt.Printf("  Secondary : data, delete, capabilities\n")
-	fmt.Printf("  Helper    : template, rectangle\n")
+	fmt.Printf("  Helper    : template, rectangle, coordgrid\n")
 
 	fmt.Printf("\nRemarks:\n")
 	fmt.Printf("  create       : creates the meta data for a new map\n")
@@ -249,6 +254,7 @@ func printUsage() {
 	fmt.Printf("  capabilities : fetches the capabilities of the map service\n")
 	fmt.Printf("  template     : creates a template file for building a map\n")
 	fmt.Printf("  rectangle    : calculates wkt rectangle from base values\n")
+	fmt.Printf("  coordgrid    : calculates coordinate grid in GeoJSON format\n")
 
 	fmt.Printf("\nHow to start:\n")
 	fmt.Printf("  - Start with creating a new directory on your local system.\n")
@@ -643,7 +649,7 @@ func rectangle() {
 		fmt.Printf("Usage:\n")
 		fmt.Printf("  %s rectangle  x    y    width  height size\n", progName)
 		fmt.Printf("\nExample:\n")
-		fmt.Printf("  %s rectangle  0.0  0.0  600.0  600.0  15.0\n", progName)
+		fmt.Printf("  %s rectangle  0.0  0.0  420.0  594.0  20.0\n", progName)
 		return
 	}
 
@@ -721,6 +727,127 @@ func rectangle() {
 		innerLowerLeftX, innerLowerLeftY)
 }
 
+/*
+coordgrid calculates a coordinate grid and saves it as GeoJSON files
+*/
+func coordgrid() {
+
+	if len(os.Args) != 7 {
+		fmt.Printf("Usage:\n")
+		fmt.Printf("  %s coordgrid  latmin  lonmin  latmax  lonmax  distance\n", progName)
+		fmt.Printf("\nExample:\n")
+		fmt.Printf("  %s coordgrid  53.4    9.9     53.6    10.1    0.01\n", progName)
+		fmt.Printf("\nRemark:\n")
+		fmt.Printf("  fractional digits of coord labels = fractional digits of grid distance\n")
+		return
+	}
+
+	latMin, err := strconv.ParseFloat(os.Args[2], 64)
+	if err != nil {
+		fmt.Printf("\nerror: latmin (%s) not a float value\n", os.Args[2])
+		return
+	}
+	lonMin, err := strconv.ParseFloat(os.Args[3], 64)
+	if err != nil {
+		fmt.Printf("\nerror: lonmin (%s) not a float value\n", os.Args[3])
+		return
+	}
+	latMax, err := strconv.ParseFloat(os.Args[4], 64)
+	if err != nil {
+		fmt.Printf("\nerror: latmax (%s) not a float value\n", os.Args[4])
+		return
+	}
+	lonMax, err := strconv.ParseFloat(os.Args[5], 64)
+	if err != nil {
+		fmt.Printf("\nerror: lonmax (%s) not a float value\n", os.Args[5])
+		return
+	}
+	gridDistance, err := strconv.ParseFloat(os.Args[6], 64)
+	if err != nil {
+		fmt.Printf("\nerror: distance (%s) not a float value\n", os.Args[6])
+		return
+	}
+
+	// derive coord label format from 'fractional digits of grid distance'
+	fractionalDigits := 0
+	tmp := strings.SplitN(os.Args[6], ".", 2)
+	if len(tmp) > 1 {
+		fractionalDigits = len(tmp[1])
+	}
+	coordLabelFormat := fmt.Sprintf("%%.%df", fractionalDigits)
+
+	// verify input data
+	if latMin >= latMax || lonMin >= lonMax {
+		fmt.Printf("\nerror: invalid coord parameters\n")
+		return
+	}
+
+	distanceIntegerPart, _ := strconv.Atoi(tmp[0])
+	distanceFractionalPart := 0
+	if len(tmp) > 1 {
+		distanceFractionalPart, _ = strconv.Atoi(tmp[1])
+	}
+	if distanceIntegerPart == 0 && distanceFractionalPart == 0 {
+		fmt.Printf("\nerror: invalid distance\n")
+		return
+	}
+
+	// latitude grid lines (order: longitude, latitude)
+	lsLat := make(orb.LineString, 0, 2)
+	fcLat := geojson.NewFeatureCollection()
+
+	for latTemp := latMin; latTemp <= latMax; latTemp += gridDistance {
+		lsLat = append(lsLat, orb.Point{lonMin, latTemp})
+		lsLat = append(lsLat, orb.Point{lonMax, latTemp})
+		feature := geojson.NewFeature(lsLat)
+		feature.Properties = make(map[string]interface{})
+		feature.Properties["name"] = fmt.Sprintf(coordLabelFormat, latTemp)
+		fcLat.Append(feature)
+		lsLat = nil // reuse LineString object
+	}
+
+	dataJSON, err := json.MarshalIndent(fcLat, "", "  ")
+	if err != nil {
+		log.Fatalf("error <%v> at json.MarshalIndent()", err)
+	}
+
+	// write data ([]byte) to file
+	filename := "latgrid.geojson"
+	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("error <%v> at ioutil.WriteFile(); file = <%v>", err, filename)
+	}
+
+	fmt.Printf("\nlatitude coordinate grid lines: %s\n", filename)
+
+	// longitude grid lines (order: longitude, latitude)
+	lsLon := make(orb.LineString, 0, 2)
+	fcLon := geojson.NewFeatureCollection()
+
+	for lonTemp := lonMin; lonTemp <= lonMax; lonTemp += gridDistance {
+		// mls = append(mls, orb.LineString{{lonTemp, latMin}, {lonTemp, latMax}})
+		lsLon = append(lsLon, orb.Point{lonTemp, latMin})
+		lsLon = append(lsLon, orb.Point{lonTemp, latMax})
+		feature := geojson.NewFeature(lsLon)
+		feature.Properties = make(map[string]interface{})
+		feature.Properties["name"] = fmt.Sprintf(coordLabelFormat, lonTemp)
+		fcLon.Append(feature)
+		lsLon = nil // reuse LineString object
+	}
+
+	dataJSON, err = json.MarshalIndent(fcLon, "", "  ")
+	if err != nil {
+		log.Fatalf("error <%v> at json.MarshalIndent()", err)
+	}
+
+	// write data ([]byte) to file
+	filename = "longrid.geojson"
+	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("error <%v> at ioutil.WriteFile(); file = <%v>", err, filename)
+	}
+
+	fmt.Printf("longitude coordinate grid lines: %s\n", filename)
+}
+
 var mapTemplate = `# map definition file
 # -------------------
 # - do not use tabs or unnecessary white spaces
@@ -757,7 +884,7 @@ ServiceURL: http://printmaps-osm.de:8181/api/beta/maps/
 # essential map attributes (required)
 # -----------------------------------
 
-# file format (e.g. pdf, png)
+# file format (e.g. png)
 Fileformat: png
 
 # scale as in "1:10000" (e.g. 10000, 25000)
