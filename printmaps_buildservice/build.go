@@ -29,12 +29,12 @@ import (
 
 // MapnikData describes the data returned by the mapnik driver in "info mode"
 type MapnikData struct {
-	scale       float64
-	scaleFactor float64
-	BoxPixel    BoxPixel
-	BoxEPSG3857 BoxEPSG3857
-	BoxEPSG4326 BoxEPSG4326
-	layers      string
+	scale         float64
+	scaleFactor   float64
+	BoxPixel      BoxPixel
+	BoxProjection BoxProjection
+	BoxWGS84      BoxWGS84
+	layers        string
 }
 
 /*
@@ -63,7 +63,7 @@ func buildMapnikMap(tempdir string, pmData PrintmapsData, pmState *PrintmapsStat
 
 	hideLayersFeature := ""
 	if pmData.Data.Attributes.HideLayers != "" {
-		hideLayersFeature = fmt.Sprintf("--hide-layers %s", pmData.Data.Attributes.HideLayers)
+		hideLayersFeature = fmt.Sprintf("--hide-layers '%s'", pmData.Data.Attributes.HideLayers)
 	}
 
 	mapnikMapname := filepath.Join(tempdir, mapBasename+"."+pmData.Data.Attributes.Fileformat)
@@ -72,11 +72,11 @@ func buildMapnikMap(tempdir string, pmData PrintmapsData, pmState *PrintmapsStat
 	if pmData.Data.Attributes.Fileformat == "png" {
 		pixelPerInch = 300
 	}
-	// call mapnik driver in "info mode" (get the build parameters)
 
-	command := fmt.Sprintf("%s --debug --info %s --scale %d --size %f %f --ppi %d --center %f %f %s %s",
+	// call mapnik driver in "info mode" (get the build parameters)
+	command := fmt.Sprintf("%s --debug --info --tiles 1 %s --projection '%s' --scale %d --size %f %f --ppi %d --center %f %f %s %s",
 		config.Mapnikdriver,
-		hideLayersFeature, pmData.Data.Attributes.Scale,
+		hideLayersFeature, pmData.Data.Attributes.Projection, pmData.Data.Attributes.Scale,
 		pmData.Data.Attributes.PrintWidth, pmData.Data.Attributes.PrintHeight,
 		pixelPerInch,
 		pmData.Data.Attributes.Longitude, pmData.Data.Attributes.Latitude,
@@ -119,10 +119,9 @@ func buildMapnikMap(tempdir string, pmData PrintmapsData, pmState *PrintmapsStat
 	}
 
 	// call mapnik driver in "build mode"
-
-	command = fmt.Sprintf("%s --debug %s --scale %d --size %f %f --ppi %d --center %f %f %s %s",
+	command = fmt.Sprintf("%s --debug --tiles 1 %s --projection '%s' --scale %d --size %f %f --ppi %d --center %f %f %s %s",
 		config.Mapnikdriver,
-		hideLayersFeature, pmData.Data.Attributes.Scale,
+		hideLayersFeature, pmData.Data.Attributes.Projection, pmData.Data.Attributes.Scale,
 		pmData.Data.Attributes.PrintWidth, pmData.Data.Attributes.PrintHeight,
 		pixelPerInch,
 		pmData.Data.Attributes.Longitude, pmData.Data.Attributes.Latitude,
@@ -155,8 +154,8 @@ func buildMapnikMap(tempdir string, pmData PrintmapsData, pmState *PrintmapsStat
 	pmState.Data.Attributes.MapBuildBoxMillimeter.Width = pmData.Data.Attributes.PrintWidth
 	pmState.Data.Attributes.MapBuildBoxMillimeter.Height = pmData.Data.Attributes.PrintHeight
 	pmState.Data.Attributes.MapBuildBoxPixel = mapnikData.BoxPixel
-	pmState.Data.Attributes.MapBuildBoxEPSG3857 = mapnikData.BoxEPSG3857
-	pmState.Data.Attributes.MapBuildBoxEPSG4326 = mapnikData.BoxEPSG4326
+	pmState.Data.Attributes.MapBuildBoxProjection = mapnikData.BoxProjection
+	pmState.Data.Attributes.MapBuildBoxWGS84 = mapnikData.BoxWGS84
 
 	return nil
 }
@@ -198,17 +197,11 @@ func createUserMapnikXML(pmData PrintmapsData, mapnikData MapnikData) (string, e
 
 	// special style 'raster map'
 	if pmData.Data.Attributes.Style == "raster10" {
-		includeLines = createRasterMap(includeLines, mapnikData)
+		includeLines = createRasterMap(includeLines, mapnikData, pmData)
 	}
 
-	// user data
-	includeLines = createUserData(includeLines, pmData)
-
 	// user items
-	includeLines = createUserItems(includeLines, pmData, mapnikData, pmData.Data.Attributes.PrintWidth, pmData.Data.Attributes.PrintHeight)
-
-	// user scalebar
-	includeLines = createUserScalebar(includeLines, pmData, mapnikData, pmData.Data.Attributes.PrintWidth, pmData.Data.Attributes.PrintHeight)
+	includeLines = createUserObjects(includeLines, pmData, mapnikData, pmData.Data.Attributes.PrintWidth, pmData.Data.Attributes.PrintHeight)
 
 	// modify file references
 	includeLines = modifyFileReferences(includeLines, pmData)
@@ -286,10 +279,10 @@ func slurpFile(filename string) ([]string, error) {
 /*
 createRasterMap creates a technical map with a 10 x 10 raster
 */
-func createRasterMap(lineBuffer []string, mapnikData MapnikData) []string {
+func createRasterMap(lineBuffer []string, mapnikData MapnikData, pmData PrintmapsData) []string {
 
 	rasterName := "raster10"
-	BoxEPSG3857 := mapnikData.BoxEPSG3857
+	BoxProjection := mapnikData.BoxProjection
 
 	lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("<Style name='%s'>\n", rasterName))
@@ -298,26 +291,26 @@ func createRasterMap(lineBuffer []string, mapnikData MapnikData) []string {
 	lineBuffer = append(lineBuffer, fmt.Sprintf("  </Rule>\n"))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("</Style>\n"))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='+init=epsg:3857'>\n", rasterName))
+	lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='+init=epsg:%s'>\n", rasterName, pmData.Data.Attributes.Projection))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("  <StyleName>%s</StyleName>\n", rasterName))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("  <Datasource>\n"))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='type'>csv</Parameter>\n"))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='inline'>\n"))
 	lineBuffer = append(lineBuffer, fmt.Sprintf("id|name|wkt\n"))
 
-	xInterval := (BoxEPSG3857.XMax - BoxEPSG3857.XMin) / 10.0
-	yInterval := (BoxEPSG3857.YMax - BoxEPSG3857.YMin) / 10.0
+	xInterval := (BoxProjection.XMax - BoxProjection.XMin) / 10.0
+	yInterval := (BoxProjection.YMax - BoxProjection.YMin) / 10.0
 	for index := 1; index < 10; index++ {
 		// horizontal raster line
-		horizontalLeftX := BoxEPSG3857.XMin
-		horizontalLeftY := BoxEPSG3857.YMin + (float64(index) * yInterval)
-		horizontalRightX := BoxEPSG3857.XMax
-		horizontalRightY := BoxEPSG3857.YMin + (float64(index) * yInterval)
+		horizontalLeftX := BoxProjection.XMin
+		horizontalLeftY := BoxProjection.YMin + (float64(index) * yInterval)
+		horizontalRightX := BoxProjection.XMax
+		horizontalRightY := BoxProjection.YMin + (float64(index) * yInterval)
 		// vertical raster line
-		verticalLowerX := BoxEPSG3857.XMin + (float64(index) * xInterval)
-		verticalLowerY := BoxEPSG3857.YMin
-		verticalUpperX := BoxEPSG3857.XMin + (float64(index) * xInterval)
-		verticalUpperY := BoxEPSG3857.YMax
+		verticalLowerX := BoxProjection.XMin + (float64(index) * xInterval)
+		verticalLowerY := BoxProjection.YMin
+		verticalUpperX := BoxProjection.XMin + (float64(index) * xInterval)
+		verticalUpperY := BoxProjection.YMax
 		// create data entries
 		lineBuffer = append(lineBuffer, fmt.Sprintf("%d|horizontal|LINESTRING(%f %f, %f %f)\n", index, horizontalLeftX, horizontalLeftY, horizontalRightX, horizontalRightY))
 		lineBuffer = append(lineBuffer, fmt.Sprintf("%d|vertical|LINESTRING(%f %f, %f %f)\n", index, verticalLowerX, verticalLowerY, verticalUpperX, verticalUpperY))
@@ -331,7 +324,8 @@ func createRasterMap(lineBuffer []string, mapnikData MapnikData) []string {
 }
 
 /*
-createUserData creates the user defined data objects
+createUserObjects creates the user defined data elementes
+
 OGR:
   <Parameter name="type">ogr</Parameter>
   <Parameter name="file">test_point_line.gpx</Parameter>
@@ -342,102 +336,63 @@ ShapeFile:
 GDAL:
   <Parameter name="type">gdal</Parameter>
   <Parameter name="file">/path/to/your/data/raster.tiff</Parameter>
-*/
-func createUserData(lineBuffer []string, pmData PrintmapsData) []string {
 
-	for index, userData := range pmData.Data.Attributes.UserData {
-		userDataName := fmt.Sprintf("userdata-%d", index)
-		lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("<Style name='%s'>\n", userDataName))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  <Rule>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    %s\n", userData.Style))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  </Rule>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("</Style>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='%s'>\n", userDataName, userData.SRS))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  <StyleName>%s</StyleName>\n", userDataName))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  <Datasource>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='type'>%s</Parameter>\n", userData.Type))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='file'>%s</Parameter>\n", userData.File))
-		if userData.Layer != "" {
-			lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='layer'>%s</Parameter>\n", userData.Layer))
+data object has filled elements:
+- Style
+- SRS
+- Type
+- File
+- Layer
+
+item object has filled elements:
+- Style
+- WellKnownText
+*/
+func createUserObjects(lineBuffer []string, pmData PrintmapsData, mapnikData MapnikData, width float64, height float64) []string {
+
+	for index, userObject := range pmData.Data.Attributes.UserObjects {
+		if userObject.WellKnownText != "" {
+			// item object
+			objectName := fmt.Sprintf("userobject-%d", index)
+			lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("<Style name='%s'>\n", objectName))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  <Rule>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    %s\n", userObject.Style))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  </Rule>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("</Style>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='+init=epsg:%s'>\n", objectName, pmData.Data.Attributes.Projection))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  <StyleName>%s</StyleName>\n", objectName))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  <Datasource>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='type'>csv</Parameter>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='inline'>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("id|name|wkt\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("1|%s|%s\n", objectName, transformWellKnownText(userObject.WellKnownText, mapnikData, width, height)))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    </Parameter>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  </Datasource>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("</Layer>\n"))
+		} else {
+			// data object
+			objectName := fmt.Sprintf("userobject-%d", index)
+			lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("<Style name='%s'>\n", objectName))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  <Rule>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    %s\n", userObject.Style))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  </Rule>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("</Style>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='%s'>\n", objectName, userObject.SRS))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  <StyleName>%s</StyleName>\n", objectName))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  <Datasource>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='type'>%s</Parameter>\n", userObject.Type))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='file'>%s</Parameter>\n", userObject.File))
+			if userObject.Layer != "" {
+				lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='layer'>%s</Parameter>\n", userObject.Layer))
+			}
+			lineBuffer = append(lineBuffer, fmt.Sprintf("  </Datasource>\n"))
+			lineBuffer = append(lineBuffer, fmt.Sprintf("</Layer>\n"))
 		}
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  </Datasource>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("</Layer>\n"))
 	}
-
-	return lineBuffer
-}
-
-/*
-createUserItems creates the user defined annotation elementes
-*/
-func createUserItems(lineBuffer []string, pmData PrintmapsData, mapnikData MapnikData, width float64, height float64) []string {
-
-	for index, userItem := range pmData.Data.Attributes.UserItems {
-		userItemName := fmt.Sprintf("useritem-%d", index)
-		lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("<Style name='%s'>\n", userItemName))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  <Rule>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    %s\n", userItem.Style))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  </Rule>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("</Style>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='+init=epsg:3857'>\n", userItemName))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  <StyleName>%s</StyleName>\n", userItemName))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  <Datasource>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='type'>csv</Parameter>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='inline'>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("id|name|wkt\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("1|%s|%s\n", userItemName, transformWellKnownText(userItem.WellKnownText, mapnikData, width, height)))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("    </Parameter>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("  </Datasource>\n"))
-		lineBuffer = append(lineBuffer, fmt.Sprintf("</Layer>\n"))
-	}
-
-	return lineBuffer
-}
-
-/*
-createUserScalebar creates the user defined scalebar
-*/
-func createUserScalebar(lineBuffer []string, pmData PrintmapsData, mapnikData MapnikData, width float64, height float64) []string {
-
-	if pmData.Data.Attributes.UserScalebar.Style == "" || pmData.Data.Attributes.UserScalebar.NatureLength <= 0.0 {
-		// nothing to do
-		return lineBuffer
-	}
-
-	// calculate coords per millimeter
-	BoxEPSG3857 := mapnikData.BoxEPSG3857
-	coordsXMM := (BoxEPSG3857.XMax - BoxEPSG3857.XMin) / width
-	coordsYMM := (BoxEPSG3857.YMax - BoxEPSG3857.YMin) / height
-
-	scalebarLength := pmData.Data.Attributes.UserScalebar.NatureLength * 1000.0 / float64(pmData.Data.Attributes.Scale)
-	scalebarLeftX := BoxEPSG3857.XMin + pmData.Data.Attributes.UserScalebar.XPos*coordsXMM
-	scalebarLeftY := BoxEPSG3857.YMin + pmData.Data.Attributes.UserScalebar.YPos*coordsYMM
-	scalebarRightX := scalebarLeftX + scalebarLength*coordsXMM
-	scaleBarRightY := scalebarLeftY
-	scalebarDefinition := fmt.Sprintf("LINESTRING(%f %f, %f %f)", scalebarLeftX, scalebarLeftY, scalebarRightX, scaleBarRightY)
-
-	scalebarName := "userscalebar"
-	lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("<Style name='%s'>\n", scalebarName))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("  <Rule>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("    %s\n", pmData.Data.Attributes.UserScalebar.Style))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("  </Rule>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("</Style>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("<Layer name='%s' srs='+init=epsg:3857'>\n", scalebarName))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("  <StyleName>%s</StyleName>\n", scalebarName))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("  <Datasource>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='type'>csv</Parameter>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("    <Parameter name='inline'>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("id|name|wkt\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("1|%s|%s\n", scalebarName, scalebarDefinition))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("    </Parameter>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("  </Datasource>\n"))
-	lineBuffer = append(lineBuffer, fmt.Sprintf("</Layer>\n"))
 
 	return lineBuffer
 }
@@ -560,19 +515,19 @@ func parseMapnikData(commandOutput []byte, mapnikData *MapnikData) error {
 		return errors.New(message)
 	}
 
-	// bbox (google web mercator, epsg:3857)
+	// bbox (projection)
 	_, err = fmt.Sscanf(lines[i+3], "bbox=Box2d(%f,%f,%f,%f)",
-		&mapnikData.BoxEPSG3857.XMin, &mapnikData.BoxEPSG3857.YMin,
-		&mapnikData.BoxEPSG3857.XMax, &mapnikData.BoxEPSG3857.YMax)
+		&mapnikData.BoxProjection.XMin, &mapnikData.BoxProjection.YMin,
+		&mapnikData.BoxProjection.XMax, &mapnikData.BoxProjection.YMax)
 	if err != nil {
 		message := fmt.Sprintf("error <%s> at fmt.Sscanf() (bbox=Box2d)", err)
 		return errors.New(message)
 	}
 
-	// bbox_wgs84 (wgs 84, epsg:4326)
+	// bbox_wgs84 (wgs84, epsg:4326)
 	_, err = fmt.Sscanf(lines[i+4], "bbox_wgs84=Box2d(%f,%f,%f,%f)",
-		&mapnikData.BoxEPSG4326.LonMin, &mapnikData.BoxEPSG4326.LatMin,
-		&mapnikData.BoxEPSG4326.LonMax, &mapnikData.BoxEPSG4326.LatMax)
+		&mapnikData.BoxWGS84.LonMin, &mapnikData.BoxWGS84.LatMin,
+		&mapnikData.BoxWGS84.LonMax, &mapnikData.BoxWGS84.LatMax)
 	if err != nil {
 		message := fmt.Sprintf("error <%s> at fmt.Sscanf() (bbox_wgs84=Box2d)", err)
 		return errors.New(message)
@@ -601,9 +556,9 @@ func transformWellKnownText(input string, mapnikData MapnikData, width float64, 
 	coordinate := false
 
 	// calculate coords per millimeter
-	BoxEPSG3857 := mapnikData.BoxEPSG3857
-	coordsXMM := (BoxEPSG3857.XMax - BoxEPSG3857.XMin) / width
-	coordsYMM := (BoxEPSG3857.YMax - BoxEPSG3857.YMin) / height
+	BoxProjection := mapnikData.BoxProjection
+	coordsXMM := (BoxProjection.XMax - BoxProjection.XMin) / width
+	coordsYMM := (BoxProjection.YMax - BoxProjection.YMin) / height
 
 	for _, runeValue := range input {
 		if unicode.IsDigit(runeValue) || runeValue == '.' {
@@ -616,10 +571,10 @@ func transformWellKnownText(input string, mapnikData MapnikData, width float64, 
 					log.Printf("error <%v> at strconv.ParseFloat(), value = <%s>", err, coordinateValue)
 				}
 				if coordinateType == "x" {
-					output += fmt.Sprintf("%.1f", (BoxEPSG3857.XMin + (coordinateFloat * coordsXMM)))
+					output += fmt.Sprintf("%.1f", (BoxProjection.XMin + (coordinateFloat * coordsXMM)))
 					coordinateType = "y"
 				} else {
-					output += fmt.Sprintf("%.1f", (BoxEPSG3857.YMin + (coordinateFloat * coordsYMM)))
+					output += fmt.Sprintf("%.1f", (BoxProjection.YMin + (coordinateFloat * coordsYMM)))
 					coordinateType = "x"
 				}
 				coordinateValue = ""

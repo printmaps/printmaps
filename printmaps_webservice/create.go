@@ -154,8 +154,8 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 			pmState.Data.Attributes.MapBuildMessage = ""
 			pmState.Data.Attributes.MapBuildBoxMillimeter = BoxMillimeter{}
 			pmState.Data.Attributes.MapBuildBoxPixel = BoxPixel{}
-			pmState.Data.Attributes.MapBuildBoxEPSG3857 = BoxEPSG3857{}
-			pmState.Data.Attributes.MapBuildBoxEPSG4326 = BoxEPSG4326{}
+			pmState.Data.Attributes.MapBuildBoxProjection = BoxProjection{}
+			pmState.Data.Attributes.MapBuildBoxWGS84 = BoxWGS84{}
 			if err = writeMapstate(pmState); err != nil {
 				message := fmt.Sprintf("error <%v> at updateMapstate()", err)
 				http.Error(writer, message, http.StatusInternalServerError)

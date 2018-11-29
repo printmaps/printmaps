@@ -63,27 +63,14 @@ type PrintmapsData struct {
 	}
 }
 
-// UserData describes an user defined data object (e.g. track, waypoint, ...)
-type UserData struct {
-	Style string `yaml:"Style"`
-	SRS   string `yaml:"SRS"`
-	Type  string `yaml:"Type"`
-	File  string `yaml:"File"`
-	Layer string `yaml:"Layer"`
-}
-
-// UserItem describes an user defined map object (e.g. point, polygon, ...)
-type UserItem struct {
+// UserObject describes an user defined data object (e.g. track, waypoint, ...)
+type UserObject struct {
 	Style         string `yaml:"Style"`
-	WellKnownText string `yaml:"WellKnownText"`
-}
-
-// UserScalebar describes an user defined scalebar object
-type UserScalebar struct {
-	Style        string  `yaml:"Style"`
-	NatureLength float64 `yaml:"NatureLength"`
-	XPos         float64 `yaml:"XPos"`
-	YPos         float64 `yaml:"YPos"`
+	SRS           string `json:",omitempty" yaml:"SRS"`
+	Type          string `json:",omitempty" yaml:"Type"`
+	File          string `json:",omitempty" yaml:"File"`
+	Layer         string `json:",omitempty" yaml:"Layer"`
+	WellKnownText string `json:",omitempty" yaml:"WellKnownText"`
 }
 
 // Metadata is used for the description of the map (what to build)
@@ -96,21 +83,16 @@ type Metadata struct {
 	Latitude    float64 `yaml:"Latitude"`
 	Longitude   float64 `yaml:"Longitude"`
 	Style       string  `yaml:"Style"`
+	Projection  string  `yaml:"Projection"`
 
 	// advanced map attributes (optional)
 	HideLayers string `yaml:"HideLayers"`
 
 	// user defined data objects (optional)
-	UserData []UserData `yaml:"UserData"`
-
-	// user defined map elements (optional)
-	UserItems []UserItem `yaml:"UserItems"`
-
-	// user defined scalebar (optional)
-	UserScalebar UserScalebar `yaml:"UserScalebar"`
+	UserObjects []UserObject `yaml:"UserObjects"`
 
 	// uploaded user files (read-only value)
-	UserFiles string `json:"UserFiles,omitempty" yaml:"-"`
+	UserFiles string `json:",omitempty" yaml:"-"`
 }
 
 // PrintmapsState is used for the Printmaps process state (response object)
@@ -134,16 +116,16 @@ type BoxPixel struct {
 	Height int
 }
 
-// BoxEPSG3857 represents a spatial envelope (bounding box)
-type BoxEPSG3857 struct {
+// BoxProjection represents a spatial envelope (bounding box)
+type BoxProjection struct {
 	XMin float64
 	YMin float64
 	XMax float64
 	YMax float64
 }
 
-// BoxEPSG4326 represents a spatial envelope (bounding box)
-type BoxEPSG4326 struct {
+// BoxWGS84 represents a spatial envelope (bounding box)
+type BoxWGS84 struct {
 	LonMin float64
 	LatMin float64
 	LonMax float64
@@ -160,8 +142,8 @@ type Mapstate struct {
 	MapBuildMessage       string
 	MapBuildBoxMillimeter BoxMillimeter
 	MapBuildBoxPixel      BoxPixel
-	MapBuildBoxEPSG3857   BoxEPSG3857
-	MapBuildBoxEPSG4326   BoxEPSG4326
+	MapBuildBoxProjection BoxProjection
+	MapBuildBoxWGS84      BoxWGS84
 }
 
 /*

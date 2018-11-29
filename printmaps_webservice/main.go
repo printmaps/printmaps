@@ -6,16 +6,18 @@ Description:
 - Webservice to build large printable maps based on OSM data.
 
 Releases:
-- 0.1.0 - 2017/05/23 : beta 1
+- 0.1.0 - 2017/05/23 : initial release (beta version)
 - 0.1.1 - 2017/05/26 : improvements
 - 0.1.2 - 2017/07/04 : problem with upload filename fixed
 - 0.2.0 - 2018/04/22 : support for full planet implemented
+- 0.3.0 - 2018/11/29 : service URL changed to beta2 (incompatible with beta)
+                       update data issue fixed
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017 Klaus Tockloth
+- Copyright (c) 2017,2018 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -129,8 +131,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.2.0"
-	progDate    = "2018/04/22"
+	progVersion = "0.3.0"
+	progDate    = "2018/11/29"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -292,26 +294,26 @@ func main() {
 	if config.Maintenancemode == false {
 		// production mode
 		// GET (fetch resource)
-		router.GET("/api/beta/maps/metadata/:id", middlewareHandler(fetchMetadata))
-		router.GET("/api/beta/maps/mapstate/:id", middlewareHandler(fetchMapstate))
-		router.GET("/api/beta/maps/mapfile/:id", middlewareHandler(fetchMapfile))
+		router.GET("/api/beta2/maps/metadata/:id", middlewareHandler(fetchMetadata))
+		router.GET("/api/beta2/maps/mapstate/:id", middlewareHandler(fetchMapstate))
+		router.GET("/api/beta2/maps/mapfile/:id", middlewareHandler(fetchMapfile))
 
 		// POST (create resource)
-		router.POST("/api/beta/maps/metadata", middlewareHandler(createMetadata))
-		router.POST("/api/beta/maps/mapfile", middlewareHandler(createMapfile))
+		router.POST("/api/beta2/maps/metadata", middlewareHandler(createMetadata))
+		router.POST("/api/beta2/maps/mapfile", middlewareHandler(createMapfile))
 
 		// PATCH (update resource)
-		router.PATCH("/api/beta/maps/metadata", middlewareHandler(updateMetadata))
+		router.PATCH("/api/beta2/maps/metadata", middlewareHandler(updateMetadata))
 
 		// DELETE (delete resource)
-		router.DELETE("/api/beta/maps/:id", middlewareHandler(deleteMap))
+		router.DELETE("/api/beta2/maps/:id", middlewareHandler(deleteMap))
 
 		// service / mapdata capabilities
-		router.GET("/api/beta/maps/capabilities/service", middlewareHandler(revealCapaService))
-		router.GET("/api/beta/maps/capabilities/mapdata", middlewareHandler(revealCapaMapdata))
+		router.GET("/api/beta2/maps/capabilities/service", middlewareHandler(revealCapaService))
+		router.GET("/api/beta2/maps/capabilities/mapdata", middlewareHandler(revealCapaMapdata))
 
 		// upload user data file
-		router.POST("/api/beta/maps/upload/:id", middlewareHandler(uploadUserdata))
+		router.POST("/api/beta2/maps/upload/:id", middlewareHandler(uploadUserdata))
 	} else {
 		// maintenance mode (catches all requests)
 		log.Printf("--> MAINTENANCE MODE ACTIVATED <--")

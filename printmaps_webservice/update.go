@@ -43,6 +43,7 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 	id := pmDataPost.Data.ID
 	userFiles := ""
 
+	/* not working if array map data is restructured
 	// step 1: read map data from file
 	if len(pmErrorList.Errors) == 0 {
 		if err := readMetadata(&pmData, id); err != nil {
@@ -59,6 +60,16 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 	}
 
 	// step 2: overlay map data (from file) with post data (body)
+	if len(pmErrorList.Errors) == 0 {
+		if err = json.Unmarshal(bodyBytes, &pmData); err != nil {
+			appendError(&pmErrorList, "2001", "error = "+err.Error(), id)
+		} else {
+			verifyMetadata(pmData, &pmErrorList)
+		}
+	}
+	*/
+
+	// the update data set must contains all map elements (changed + unchanged)
 	if len(pmErrorList.Errors) == 0 {
 		if err = json.Unmarshal(bodyBytes, &pmData); err != nil {
 			appendError(&pmErrorList, "2001", "error = "+err.Error(), id)
@@ -104,8 +115,8 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		pmState.Data.Attributes.MapBuildMessage = ""
 		pmState.Data.Attributes.MapBuildBoxMillimeter = BoxMillimeter{}
 		pmState.Data.Attributes.MapBuildBoxPixel = BoxPixel{}
-		pmState.Data.Attributes.MapBuildBoxEPSG3857 = BoxEPSG3857{}
-		pmState.Data.Attributes.MapBuildBoxEPSG4326 = BoxEPSG4326{}
+		pmState.Data.Attributes.MapBuildBoxProjection = BoxProjection{}
+		pmState.Data.Attributes.MapBuildBoxWGS84 = BoxWGS84{}
 		if err = writeMapstate(pmState); err != nil {
 			message := fmt.Sprintf("error <%v> at updateMapstate()", err)
 			http.Error(writer, message, http.StatusInternalServerError)

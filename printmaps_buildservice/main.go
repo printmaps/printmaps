@@ -6,18 +6,21 @@ Description:
 - Build service to build large printable maps.
 
 Releases:
-- 0.1.0 - 2017/05/23 : beta 1
+- 0.1.0 - 2017/05/23 : initial release (beta version)
 - 0.1.1 - 2017/05/26 : security enhancements
 - 0.1.2 - 2017/08/08 : more output for unsuccessful commands
 - 0.1.3 - 2017/08/10 : bug concerning parallel Chdir() fixed
 - 0.1.4 - 2017/08/17 : workaround for rare failure of os.Rename() (not working)
 - 0.1.5 - 2017/08/28 : style without layers - misleading log message fixed
+- 0.2.0 - 2018/11/29 : new projection option in mapnik driver
+                       data structures modified (to allow more flexibility)
+                       some changes are not compatible with initial release
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017 Klaus Tockloth
+- Copyright (c) 2017,2018 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -79,8 +82,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.1.5"
-	progDate    = "2017/08/28"
+	progVersion = "0.2.0"
+	progDate    = "2018/11/29"
 	progPurpose = "Printmaps Buildservice"
 	progInfo    = "Build service to build large printable maps."
 )
