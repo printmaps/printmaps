@@ -13,12 +13,13 @@ Releases:
 - 0.1.4 - 2017/06/27 : template modified
 - 0.1.5 - 2017/07/04 : problem with upload filepath fixed
 - 0.2.0 - 2018/10/24 : new helper 'coordgrid'
-- 0.3.0 - 2018/11/29 : helper 'coordgrid' renamed to 'latlongrid'
+- 0.3.0 - 2018/12/04 : helper 'coordgrid' renamed to 'latlongrid'
 					   helper 'rectangle' simplified
 					   new helper 'utmgrid', utm2latlon', latlon2utm'
 					   new helper 'bearingline', 'latlonline', 'utmline'
 					   new helper 'passepartout', 'cropmarks'
-                       map projection setting added
+					   map projection setting added
+					   new helper 'runlua'
 
 Author:
 - Klaus Tockloth
@@ -75,6 +76,7 @@ import (
 	"github.com/im7mortal/UTM"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
+	lua "github.com/yuin/gopher-lua"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -82,7 +84,7 @@ import (
 var (
 	progName    = os.Args[0]
 	progVersion = "0.3.0"
-	progDate    = "2018/11/29"
+	progDate    = "2018/12/04"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -215,6 +217,8 @@ func main() {
 		latlonline()
 	} else if action == "utmline" {
 		utmline()
+	} else if action == "runlua" {
+		runlua()
 	} else {
 		fmt.Printf("action <%v> not supported\n", action)
 	}
@@ -266,9 +270,12 @@ func printUsage() {
 	fmt.Printf("\nActions:\n")
 	fmt.Printf("  Primary   : create, update, upload, order, state, download\n")
 	fmt.Printf("  Secondary : data, delete, capabilities\n")
-	fmt.Printf("  Helper    : template, rectangle, cropmarks\n")
-	fmt.Printf("  Helper    : latlongrid, utmgrid, latlon2utm, utm2latlon\n")
+	fmt.Printf("  Helper    : template\n")
+	fmt.Printf("  Helper    : passepartout, rectangle, cropmarks\n")
+	fmt.Printf("  Helper    : latlongrid, utmgrid\n")
+	fmt.Printf("  Helper    : latlon2utm, utm2latlon\n")
 	fmt.Printf("  Helper    : bearingline, latlonline, utmline\n")
+	fmt.Printf("  Helper    : runlua\n")
 
 	fmt.Printf("\nRemarks:\n")
 	fmt.Printf("  create       : creates the meta data for a new map\n")
@@ -291,6 +298,7 @@ func printUsage() {
 	fmt.Printf("  bearingline  : creates geographic line in geojson format\n")
 	fmt.Printf("  latlonline   : creates geographic line in geojson format\n")
 	fmt.Printf("  utmline      : creates geographic line in geojson format\n")
+	fmt.Printf("  runlua       : run lua 5.1 script for generating labels\n")
 
 	fmt.Printf("\nHow to start:\n")
 	fmt.Printf("  - Start with creating a new directory on your local system.\n")
@@ -522,7 +530,7 @@ download downloads the map
 */
 func download() {
 
-	filename := "printmap.zip"
+	filename := "printmaps.zip"
 	requestURL := mapConfig.ServiceURL + "mapfile/" + mapID
 
 	file, err := os.Create(filename)
@@ -1340,8 +1348,6 @@ func utmline() {
 	if utmStartZoneLetter != utmEndZoneLetter {
 		log.Fatalf("\nerror: utm zone letters (%s / %s) not identical\n", utmStartZoneLetter, utmStartZoneLetter)
 	}
-	// verify eastings (must work for north and south hemisphere)
-	// verify northings (must work for north and south hemisphere)
 
 	latStart, lonStart, err := UTM.ToLatLon(utmStartEasting, utmStartNorthing, utmStartZoneNumber, utmStartZoneLetter)
 	if err != nil {
@@ -1452,6 +1458,34 @@ func bearingline() {
 }
 
 /*
+runlua runs an user supplied lua script
+*/
+func runlua() {
+
+	if len(os.Args) != 3 {
+		fmt.Printf("\nUsage:\n")
+		fmt.Printf("  %s runlua  filename\n", progName)
+		fmt.Printf("\nExample:\n")
+		fmt.Printf("  %s runlua  utmlabels.lua\n", progName)
+		fmt.Printf("\nRemarks:\n")
+		fmt.Printf("  filename = user supplied lua script\n")
+		fmt.Printf("\nHints:\n")
+		fmt.Printf("  useful to generate grid labels\n")
+		fmt.Printf("\n")
+		os.Exit(1)
+	}
+
+	L := lua.NewState()
+	defer L.Close()
+
+	luaScript := os.Args[2]
+	fmt.Printf("\nRunning '%s' with script '%s' ...\n", lua.LuaVersion, luaScript)
+	if err := L.DoFile(luaScript); err != nil {
+		log.Fatalf("\nerror <%v> at L.DoFile(); file = <%v>", err, luaScript)
+	}
+}
+
+/*
 dumpData dumps an arbitrary data object
 */
 func dumpData(writer io.Writer, objectname string, object interface{}) {
@@ -1488,14 +1522,14 @@ var mapTemplate = `# map definition file
 # author : 
 # release: 
 #
-# frame (2 + 18 = cutoff + frame):
-# printmap passepartout  420.0  594.0  20.0  20.0  20.0  20.0
+# frame (2 + 18 = bleed + frame):
+# printmaps passepartout 420.0 594.0 20.0 20.0 20.0 20.0
 #
 # crop marks:
-# printmap cropmarks  420.0  594.0  5.0
+# printmaps cropmarks 420.0 594.0 5.0
 #
 # scalebar:
-# printmap bearingline  53.49777  9.93321  90.0  1000.0  "1000 Meter"  scalebar-1000
+# printmaps bearingline 53.49777 9.93321 90.0 1000.0 "1000 Meter" scalebar-1000
 
 # service configuration
 # ---------------------
@@ -1533,6 +1567,7 @@ Style: osm-carto
 # e.g. 3857 (EPSG:3857 / WGS84 / Web Mercator) (used by Google/Bing/OpenStreetMap)
 # e.g. 32632 (EPSG:32632 / WGS 84 / UTM Zone 32N)
 # e.g. 27700 (EPSG:27700 / OSGB 1936 / British National Grid)
+# e.g. 2056 (EPSG:2056 / CH1903+ / LV95)
 Projection: 3857
 
 # advanced map attributes (optional)
@@ -1593,7 +1628,7 @@ UserObjects:
 - Style: <LineSymbolizer stroke='dimgray' stroke-width='1.0' stroke-linecap='square' />
   WellKnownText: LINESTRING(20.0 20.0, 20.0 574.0, 400.0 574.0, 400.0 20.0, 20.0 20.0)
 
- # crop marks (only the half line width is visible)
+# crop marks (only the half line width is visible)
 - Style: <LineSymbolizer stroke='dimgray' stroke-width='1.5' stroke-linecap='square' />
   WellKnownText: MULTILINESTRING((5.0 0.0, 0.0 0.0, 0.0 5.0), (5.0 594.0, 0.0 594.0, 0.0 589.0), (415.0 594.0, 420.0 594.0, 420.0 589.0), (415.0 0.0, 420.0 0.0, 420.0 5.0))
 

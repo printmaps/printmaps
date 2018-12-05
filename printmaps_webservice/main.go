@@ -10,7 +10,7 @@ Releases:
 - 0.1.1 - 2017/05/26 : improvements
 - 0.1.2 - 2017/07/04 : problem with upload filename fixed
 - 0.2.0 - 2018/04/22 : support for full planet implemented
-- 0.3.0 - 2018/11/29 : service URL changed to beta2 (incompatible with beta)
+- 0.3.0 - 2018/12/05 : service URL changed to beta2 (incompatible with beta)
                        update data issue fixed
 
 Author:
@@ -132,7 +132,7 @@ var config Config
 var (
 	progName    = os.Args[0]
 	progVersion = "0.3.0"
-	progDate    = "2018/11/29"
+	progDate    = "2018/12/05"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )

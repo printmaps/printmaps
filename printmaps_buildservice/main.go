@@ -12,7 +12,7 @@ Releases:
 - 0.1.3 - 2017/08/10 : bug concerning parallel Chdir() fixed
 - 0.1.4 - 2017/08/17 : workaround for rare failure of os.Rename() (not working)
 - 0.1.5 - 2017/08/28 : style without layers - misleading log message fixed
-- 0.2.0 - 2018/11/29 : new projection option in mapnik driver
+- 0.2.0 - 2018/12/01 : new projection option in mapnik driver
                        data structures modified (to allow more flexibility)
                        some changes are not compatible with initial release
 
@@ -83,7 +83,7 @@ import (
 var (
 	progName    = os.Args[0]
 	progVersion = "0.2.0"
-	progDate    = "2018/11/29"
+	progDate    = "2018/12/01"
 	progPurpose = "Printmaps Buildservice"
 	progInfo    = "Build service to build large printable maps."
 )
@@ -108,7 +108,7 @@ type Config struct {
 var config Config
 
 const (
-	mapBasename = "printmap"
+	mapBasename = "printmaps"
 	pdfMetaname = "meta.pdf"
 )
 

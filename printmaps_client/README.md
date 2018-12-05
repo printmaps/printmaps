@@ -10,9 +10,7 @@ die Nutzung des CLI-Clients. Damit läßt sich in kurzer Zeit eine jederzeit rep
 
 ### Workflow: Karte definieren oder Beispiel laden
 
-![](workflow-template.png)
-
-![](workflow-sample.png)
+![](workflow-init.png)
 
 ### Workflow: Karte erzeugen
 

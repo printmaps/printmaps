@@ -5,8 +5,9 @@
 # http://stackoverflow.com/documentation/go/1020/cross-compilation#t=201703051136361578518
 #
 # version 1.0.0 - 2017/06/02: initial release
+# version 1.1.0 - 2018/12/01: app renamed
 
-appname := printmap
+appname := printmaps
 sources := $(wildcard *.go)
 
 build = GOOS=$(1) GOARCH=$(2) go build -o build/$(appname)$(3)

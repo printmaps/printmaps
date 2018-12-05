@@ -22,7 +22,7 @@ const (
 	PathOrders   = "orders"        // path of orders (relative to base path)
 	FileMetadata = "metadata.json" // file holds meta data
 	FileMapstate = "mapstate.json" // file holds map state
-	FileMapfile  = "printmap.zip"  // file holds map data
+	FileMapfile  = "printmaps.zip" // file holds map data
 )
 
 // JSON identation constants
