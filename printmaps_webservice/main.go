@@ -12,6 +12,7 @@ Releases:
 - 0.2.0 - 2018/04/22 : support for full planet implemented
 - 0.3.0 - 2018/12/05 : service URL changed to beta2 (incompatible with beta)
                        update data issue fixed
+- 0.3.1 - 2018/12/05 : error check for attribute projection added
 
 Author:
 - Klaus Tockloth
@@ -131,7 +132,7 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.0"
+	progVersion = "0.3.1"
 	progDate    = "2018/12/05"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."

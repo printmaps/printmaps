@@ -43,32 +43,6 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 	id := pmDataPost.Data.ID
 	userFiles := ""
 
-	/* not working if array map data is restructured
-	// step 1: read map data from file
-	if len(pmErrorList.Errors) == 0 {
-		if err := readMetadata(&pmData, id); err != nil {
-			if os.IsNotExist(err) {
-				appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
-			} else {
-				message := fmt.Sprintf("error <%v> at readMetadata(), id = <%s>", err, id)
-				http.Error(writer, message, http.StatusInternalServerError)
-				log.Printf("Response %d - %s", http.StatusInternalServerError, message)
-				return
-			}
-		}
-		userFiles = pmData.Data.Attributes.UserFiles
-	}
-
-	// step 2: overlay map data (from file) with post data (body)
-	if len(pmErrorList.Errors) == 0 {
-		if err = json.Unmarshal(bodyBytes, &pmData); err != nil {
-			appendError(&pmErrorList, "2001", "error = "+err.Error(), id)
-		} else {
-			verifyMetadata(pmData, &pmErrorList)
-		}
-	}
-	*/
-
 	// the update data set must contains all map elements (changed + unchanged)
 	if len(pmErrorList.Errors) == 0 {
 		if err = json.Unmarshal(bodyBytes, &pmData); err != nil {

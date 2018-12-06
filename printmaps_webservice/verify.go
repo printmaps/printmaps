@@ -98,12 +98,14 @@ func verifyMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
 			appendError(pmErrorList, "3004", message, pmData.Data.ID)
 		}
 	}
+
 	if pmData.Data.Attributes.PrintHeight != 0 && inputMapformat.Type != "" {
 		if pmData.Data.Attributes.PrintHeight < inputMapformat.MinPrintHeigth || pmData.Data.Attributes.PrintHeight > inputMapformat.MaxPrintHeigth {
 			message = fmt.Sprintf("valid values: %.2f ... %.2f", inputMapformat.MinPrintHeigth, inputMapformat.MaxPrintHeigth)
 			appendError(pmErrorList, "3005", message, pmData.Data.ID)
 		}
 	}
+
 	if pmData.Data.Attributes.Latitude != 0.0 {
 		// latMin := pPolygonBoundingBox.BottomLeft.Y
 		// latMax := pPolygonBoundingBox.TopRight.Y
@@ -114,6 +116,7 @@ func verifyMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
 			appendError(pmErrorList, "3006", message, pmData.Data.ID)
 		}
 	}
+
 	if pmData.Data.Attributes.Longitude != 0.0 {
 		// lonMin := pPolygonBoundingBox.BottomLeft.X
 		// lonMax := pPolygonBoundingBox.TopRight.X
@@ -122,6 +125,14 @@ func verifyMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
 		if pmData.Data.Attributes.Longitude < lonMin || pmData.Data.Attributes.Longitude > lonMax {
 			message = fmt.Sprintf("valid values: %.2f ... %.2f", lonMin, lonMax)
 			appendError(pmErrorList, "3007", message, pmData.Data.ID)
+		}
+	}
+
+	// projection must be an integer
+	if pmData.Data.Attributes.Projection != "" {
+		_, err := strconv.Atoi(pmData.Data.Attributes.Projection)
+		if err != nil {
+			appendError(pmErrorList, "3014", "projection must be an integer", pmData.Data.ID)
 		}
 	}
 
@@ -168,6 +179,9 @@ func verifyRequiredMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorLis
 	}
 	if pmData.Data.Attributes.Longitude == 0.0 {
 		missingAttributes = append(missingAttributes, "longitude")
+	}
+	if pmData.Data.Attributes.Projection == "" {
+		missingAttributes = append(missingAttributes, "projection")
 	}
 
 	if len(missingAttributes) > 0 {
@@ -232,6 +246,10 @@ func appendError(pmErrorList *PrintmapsErrorList, code string, detail string, ma
 		jaError.Status = strconv.Itoa(http.StatusUnprocessableEntity) + " " + http.StatusText(http.StatusUnprocessableEntity)
 		jaError.Source.Pointer = "data.attributes.latitude and/or data.attributes.longitude"
 		jaError.Title = "no map data available"
+	case "3014":
+		jaError.Status = strconv.Itoa(http.StatusUnprocessableEntity) + " " + http.StatusText(http.StatusUnprocessableEntity)
+		jaError.Source.Pointer = "data.attributes.projection"
+		jaError.Title = "invalid attribute projection"
 	case "4002":
 		jaError.Status = strconv.Itoa(http.StatusNotFound) + " " + http.StatusText(http.StatusNotFound)
 		jaError.Source.Pointer = "id"
@@ -242,7 +260,7 @@ func appendError(pmErrorList *PrintmapsErrorList, code string, detail string, ma
 		jaError.Title = "map build rejected, required attributes missing"
 	case "6001":
 		jaError.Status = strconv.Itoa(http.StatusPreconditionFailed) + " " + http.StatusText(http.StatusPreconditionFailed)
-		jaError.Source.Pointer = "POST: api/beta/maps/mapfile"
+		jaError.Source.Pointer = "POST: api/beta2/maps/mapfile"
 		jaError.Title = "map build order missing"
 	case "6002":
 		jaError.Status = strconv.Itoa(http.StatusPreconditionFailed) + " " + http.StatusText(http.StatusPreconditionFailed)
@@ -258,11 +276,11 @@ func appendError(pmErrorList *PrintmapsErrorList, code string, detail string, ma
 		jaError.Title = "map build process not successful"
 	case "7001":
 		jaError.Status = strconv.Itoa(http.StatusRequestEntityTooLarge) + " " + http.StatusText(http.StatusRequestEntityTooLarge)
-		jaError.Source.Pointer = "POST: api/beta/maps/upload"
+		jaError.Source.Pointer = "POST: api/beta2/maps/upload"
 		jaError.Title = "size of uploaded file exceeds upload limit"
 	case "7002":
 		jaError.Status = strconv.Itoa(http.StatusUnsupportedMediaType) + " " + http.StatusText(http.StatusUnsupportedMediaType)
-		jaError.Source.Pointer = "POST: api/beta/maps/upload"
+		jaError.Source.Pointer = "POST: api/beta2/maps/upload"
 		jaError.Title = "insecure file rejected"
 	default:
 		jaError.Status = strconv.Itoa(http.StatusInternalServerError) + " " + http.StatusText(http.StatusInternalServerError)
