@@ -18,7 +18,7 @@ Releases:
 - 0.2.1 - 2018/12/10 : pdf meta data modification removed
                        refactoring (data.go as package)
 
-					   Author:
+Author:
 - Klaus Tockloth
 
 Copyright and license:
@@ -78,7 +78,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 	yaml "gopkg.in/yaml.v2"
 )
 

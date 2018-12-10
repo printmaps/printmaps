@@ -26,7 +26,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 )
 
 // MapnikData describes the data returned by the mapnik driver in "info mode"

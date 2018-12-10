@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 )
 
 /*

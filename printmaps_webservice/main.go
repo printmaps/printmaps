@@ -114,7 +114,7 @@ import (
 
 	pip "github.com/JamesMilnerUK/pip-go"
 	"github.com/julienschmidt/httprouter"
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 	yaml "gopkg.in/yaml.v2"
 )
 

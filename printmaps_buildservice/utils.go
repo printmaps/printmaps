@@ -11,7 +11,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 )
 
 /*

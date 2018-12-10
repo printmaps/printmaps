@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 	uuid "github.com/satori/go.uuid"
 )
 

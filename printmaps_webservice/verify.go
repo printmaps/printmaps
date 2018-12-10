@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	pip "github.com/JamesMilnerUK/pip-go"
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 )
 
 /*

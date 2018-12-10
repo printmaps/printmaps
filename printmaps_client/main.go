@@ -77,7 +77,7 @@ import (
 	"github.com/im7mortal/UTM"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
-	"github.com/printmaps/printmaps/internal/pd"
+	"github.com/printmaps/printmaps/pd"
 	lua "github.com/yuin/gopher-lua"
 	yaml "gopkg.in/yaml.v2"
 )
