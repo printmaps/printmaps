@@ -20,6 +20,7 @@ Releases:
 					   new helper 'passepartout', 'cropmarks'
 					   map projection setting added
 					   new helper 'runlua'
+- 0.3.1 - 2018/12/10 : refactoring (data.go as package)
 
 Author:
 - Klaus Tockloth
@@ -76,6 +77,7 @@ import (
 	"github.com/im7mortal/UTM"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
+	"github.com/printmaps/printmaps/internal/pd"
 	lua "github.com/yuin/gopher-lua"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -83,17 +85,17 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.0"
-	progDate    = "2018/12/04"
+	progVersion = "0.3.1"
+	progDate    = "2018/12/10"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
 
 // MapConfig represents the map configuration
 type MapConfig struct {
-	ServiceURL  string   `yaml:"ServiceURL"`
-	Metadata    Metadata `yaml:"Metadata,inline"`
-	UploadFiles []string `yaml:"UserFiles"`
+	ServiceURL  string      `yaml:"ServiceURL"`
+	Metadata    pd.Metadata `yaml:"Metadata,inline"`
+	UploadFiles []string    `yaml:"UserFiles"`
 }
 
 var mapConfig MapConfig
@@ -324,14 +326,14 @@ func create() {
 		return
 	}
 
-	pmData := PrintmapsData{}
+	pmData := pd.PrintmapsData{}
 	pmData.Data.Type = "maps"
 	pmData.Data.ID = mapID
 	pmData.Data.Attributes = mapConfig.Metadata
 
 	requestURL := mapConfig.ServiceURL + "metadata"
 
-	data, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+	data, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		log.Fatalf("error <%v> at json.MarshalIndent()", err)
 	}
@@ -361,7 +363,7 @@ func create() {
 		log.Fatalf("error <%v> at ioutil.ReadAll()", err)
 	}
 
-	pmDataResponse := PrintmapsData{}
+	pmDataResponse := pd.PrintmapsData{}
 	err = json.Unmarshal(data, &pmDataResponse)
 	if err != nil {
 		log.Fatalf("error <%v> at json.Unmarshal()", err)
@@ -378,14 +380,14 @@ update updates an existing map
 */
 func update() {
 
-	pmData := PrintmapsData{}
+	pmData := pd.PrintmapsData{}
 	pmData.Data.Type = "maps"
 	pmData.Data.ID = mapID
 	pmData.Data.Attributes = mapConfig.Metadata
 
 	requestURL := mapConfig.ServiceURL + "metadata"
 
-	data, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+	data, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		log.Fatalf("error <%v> at json.MarshalIndent()", err)
 	}

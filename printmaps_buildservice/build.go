@@ -25,22 +25,24 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 // MapnikData describes the data returned by the mapnik driver in "info mode"
 type MapnikData struct {
 	scale         float64
 	scaleFactor   float64
-	BoxPixel      BoxPixel
-	BoxProjection BoxProjection
-	BoxWGS84      BoxWGS84
+	BoxPixel      pd.BoxPixel
+	BoxProjection pd.BoxProjection
+	BoxWGS84      pd.BoxWGS84
 	layers        string
 }
 
 /*
 buildMapnikMap builds the map
 */
-func buildMapnikMap(tempdir string, pmData PrintmapsData, pmState *PrintmapsState) error {
+func buildMapnikMap(tempdir string, pmData pd.PrintmapsData, pmState *pd.PrintmapsState) error {
 
 	var err error
 
@@ -163,7 +165,7 @@ func buildMapnikMap(tempdir string, pmData PrintmapsData, pmState *PrintmapsStat
 /*
 createUserMapnikXML creates an individual user mapnik xml file
 */
-func createUserMapnikXML(pmData PrintmapsData, mapnikData MapnikData) (string, error) {
+func createUserMapnikXML(pmData pd.PrintmapsData, mapnikData MapnikData) (string, error) {
 
 	var err error
 
@@ -279,7 +281,7 @@ func slurpFile(filename string) ([]string, error) {
 /*
 createRasterMap creates a technical map with a 10 x 10 raster
 */
-func createRasterMap(lineBuffer []string, mapnikData MapnikData, pmData PrintmapsData) []string {
+func createRasterMap(lineBuffer []string, mapnikData MapnikData, pmData pd.PrintmapsData) []string {
 
 	rasterName := "raster10"
 	BoxProjection := mapnikData.BoxProjection
@@ -348,7 +350,7 @@ item object has filled elements:
 - Style
 - WellKnownText
 */
-func createUserObjects(lineBuffer []string, pmData PrintmapsData, mapnikData MapnikData, width float64, height float64) []string {
+func createUserObjects(lineBuffer []string, pmData pd.PrintmapsData, mapnikData MapnikData, width float64, height float64) []string {
 
 	for index, userObject := range pmData.Data.Attributes.UserObjects {
 		if userObject.WellKnownText != "" {
@@ -400,12 +402,12 @@ func createUserObjects(lineBuffer []string, pmData PrintmapsData, mapnikData Map
 /*
 modifyFileReferences modifies all file references
 */
-func modifyFileReferences(lineBuffer []string, pmData PrintmapsData) []string {
+func modifyFileReferences(lineBuffer []string, pmData pd.PrintmapsData) []string {
 
 	// special handling for file path
-	layerPath := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID)
+	layerPath := filepath.Join(pd.PathWorkdir, pd.PathMaps, pmData.Data.ID)
 	filePathDefaultMarkers := config.Markersdir
-	filePathUserMarkers := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID)
+	filePathUserMarkers := filepath.Join(pd.PathWorkdir, pd.PathMaps, pmData.Data.ID)
 
 	// search tokens
 	layerToken := "name='file'>"

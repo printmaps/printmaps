@@ -13,6 +13,7 @@ Releases:
 - 0.3.0 - 2018/12/05 : service URL changed to beta2 (incompatible with beta)
                        update data issue fixed
 - 0.3.1 - 2018/12/05 : error check for attribute projection added
+- 0.3.2 - 2018/12/10 : refactoring (data.go as package)
 
 Author:
 - Klaus Tockloth
@@ -113,6 +114,7 @@ import (
 
 	pip "github.com/JamesMilnerUK/pip-go"
 	"github.com/julienschmidt/httprouter"
+	"github.com/printmaps/printmaps/internal/pd"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -132,8 +134,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.1"
-	progDate    = "2018/12/05"
+	progVersion = "0.3.2"
+	progDate    = "2018/12/10"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -249,19 +251,19 @@ func main() {
 	}
 
 	// save current working directory setting
-	PathWorkdir, err = os.Getwd()
+	pd.PathWorkdir, err = os.Getwd()
 	if err != nil {
 		log.Fatalf("fatal error <%v> at os.Getwd()", err)
 	}
 	log.Printf("config workdir (relative) = %s", config.Workdir)
-	log.Printf("workdir (absolute) = %s", PathWorkdir)
+	log.Printf("workdir (absolute) = %s", pd.PathWorkdir)
 
 	pid := os.Getpid()
 	log.Printf("own process identifier (pid) = %d", pid)
 	log.Printf("shutdown with SIGINT or SIGTERM")
 
 	// create 'maps' and 'orders' directory (if necessary)
-	createDirectories()
+	pd.CreateDirectories()
 
 	// full planet osm data (world) : config.Polyfile empty
 	if config.Polyfile != "" {

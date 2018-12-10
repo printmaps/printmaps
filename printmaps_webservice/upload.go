@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 /*
@@ -22,12 +23,12 @@ uploadUserdata allows the upload of an user data file (e.g. gpx file)
 */
 func uploadUserdata(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	var pmData PrintmapsData
-	var pmErrorList PrintmapsErrorList
+	var pmData pd.PrintmapsData
+	var pmErrorList pd.PrintmapsErrorList
 
 	id := params.ByName("id")
 
-	if err := readMetadata(&pmData, id); err != nil {
+	if err := pd.ReadMetadata(&pmData, id); err != nil {
 		if os.IsNotExist(err) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		} else {
@@ -51,7 +52,7 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 		defer file.Close()
 		_, userfileName = filepath.Split(header.Filename)
 
-		filename := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID, userfileName)
+		filename := filepath.Join(pd.PathWorkdir, pd.PathMaps, pmData.Data.ID, userfileName)
 		out, err := os.Create(filename)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at os.Create(), file = <%s>", err, filename)
@@ -103,14 +104,14 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 		log.Printf("uploadUserdata(): %s", message)
 	} else {
 		// request not ok, response with error list
-		content, err := json.MarshalIndent(pmErrorList, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmErrorList, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
 			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
 			return
 		}
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(content)

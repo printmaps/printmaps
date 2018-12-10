@@ -15,8 +15,10 @@ Releases:
 - 0.2.0 - 2018/12/01 : new projection option in mapnik driver
                        data structures modified (to allow more flexibility)
                        some changes are not compatible with initial release
+- 0.2.1 - 2018/12/10 : pdf meta data modification removed
+                       refactoring (data.go as package)
 
-Author:
+					   Author:
 - Klaus Tockloth
 
 Copyright and license:
@@ -76,14 +78,15 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/printmaps/printmaps/internal/pd"
 	yaml "gopkg.in/yaml.v2"
 )
 
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.2.0"
-	progDate    = "2018/12/01"
+	progVersion = "0.2.1"
+	progDate    = "2018/12/10"
 	progPurpose = "Printmaps Buildservice"
 	progInfo    = "Build service to build large printable maps."
 )
@@ -109,7 +112,6 @@ var config Config
 
 const (
 	mapBasename = "printmaps"
-	pdfMetaname = "meta.pdf"
 )
 
 // BuildResult holds the result of the build process
@@ -180,19 +182,19 @@ func main() {
 	}
 
 	// save current working directory setting
-	PathWorkdir, err = os.Getwd()
+	pd.PathWorkdir, err = os.Getwd()
 	if err != nil {
 		log.Fatalf("fatal error <%v> at os.Getwd()", err)
 	}
 	log.Printf("config workdir (relative) = %s", config.Workdir)
-	log.Printf("workdir (absolute) = %s", PathWorkdir)
+	log.Printf("workdir (absolute) = %s", pd.PathWorkdir)
 
 	pid := os.Getpid()
 	log.Printf("own process identifier (pid) = %d", pid)
 	log.Printf("shutdown with SIGINT or SIGTERM")
 
 	// create 'maps' and 'orders' directory (if necessary)
-	createDirectories()
+	pd.CreateDirectories()
 
 	// start timer trigger
 	timerTrigger := time.Tick(time.Second * 5)
@@ -257,23 +259,17 @@ buildMapMaster builds a map (master)
 func buildMapMaster(nextOrder string, chanOut chan<- struct{}) {
 
 	// create temp directory
-	tempdir, err := ioutil.TempDir(PathWorkdir, "printmaps_tempdir_")
+	tempdir, err := ioutil.TempDir(pd.PathWorkdir, "printmaps_tempdir_")
 	if err != nil {
 		log.Fatalf("fatal error <%v> at ioutil.TempDir()", err)
 	}
-
-	// tempdir := filepath.Join(PathWorkdir, "printmaps_tempdir_"+nextOrder)
-	// err := os.Mkdir(tempdir, 0700)
-	// if err != nil {
-	// 	log.Fatalf("fatal error <%v> at os.Mkdir(), dir = <%s>", err, tempdir)
-	// }
 
 	// move next order file into temp directory
 	// the rename operation fails under some rare circumstances (heavy io load, Ubuntu 16.04 LTS)
 	// in case of a failure (workaround, unfortunately not working):
 	// - rename operation will be repeated after 10 seconds
 	// - rename operation failure will only be logged
-	source := filepath.Join(PathWorkdir, PathOrders, nextOrder)
+	source := filepath.Join(pd.PathWorkdir, pd.PathOrders, nextOrder)
 	destination := filepath.Join(tempdir, nextOrder)
 	if err = os.Rename(source, destination); err != nil {
 		log.Printf("first attempt - critical error <%v> at os.Rename(), source = <%v>, destination = <%v>", err, source, destination)
@@ -311,8 +307,8 @@ buildMap builds a map
 */
 func buildMap(tempdir string, order string) {
 
-	var pmData PrintmapsData
-	var pmState PrintmapsState
+	var pmData pd.PrintmapsData
+	var pmState pd.PrintmapsState
 	var bResult BuildResult
 
 	// read meta data of map order
@@ -323,7 +319,7 @@ func buildMap(tempdir string, order string) {
 	}
 
 	// read state
-	if err := readMapstate(&pmState, pmData.Data.ID); err != nil {
+	if err := pd.ReadMapstate(&pmState, pmData.Data.ID); err != nil {
 		if !os.IsNotExist(err) {
 			log.Printf("error <%v> at readMapstate()", err)
 			log.Printf("pmData = %v", dumpPrintmapsData(pmData))
@@ -336,7 +332,7 @@ func buildMap(tempdir string, order string) {
 	pmState.Data.Attributes.MapBuildCompleted = ""
 	pmState.Data.Attributes.MapBuildSuccessful = ""
 	pmState.Data.Attributes.MapBuildMessage = ""
-	if err := writeMapstate(pmState); err != nil {
+	if err := pd.WriteMapstate(pmState); err != nil {
 		log.Printf("error <%v> at writeMapstate()", err)
 		// log.Printf("pmData = %v", dumpPrintmapsData(pmData))
 		// log.Printf("pmState = %v", dumpPrintmapsState(pmState))
@@ -354,20 +350,8 @@ func buildMap(tempdir string, order string) {
 		return
 	}
 
-	if pmData.Data.Attributes.Fileformat == "pdf" {
-		if err := modifyPDFMetadata(pmData); err != nil {
-			bResult.BuildSuccessful = "no"
-			bResult.BuildMessage = "error modifying pdf meta data"
-			setBuildResult(pmState, bResult)
-			log.Printf("error <%v> at modifyPDFMetadata()", err)
-			// log.Printf("pmData = %v", dumpPrintmapsData(pmData))
-			// log.Printf("pmState = %v", dumpPrintmapsState(pmState))
-			return
-		}
-	}
-
 	// zip map into standard download file (-j = junk directory names)
-	zipfile := filepath.Join(tempdir, FileMapfile)
+	zipfile := filepath.Join(tempdir, pd.FileMapfile)
 	mapfile := filepath.Join(tempdir, mapBasename+"."+pmData.Data.Attributes.Fileformat)
 	command := fmt.Sprintf("zip -j %s %s", zipfile, mapfile)
 	_, _, err := runCommand(command)
@@ -382,7 +366,7 @@ func buildMap(tempdir string, order string) {
 	}
 
 	// move map from temp directory to download location
-	destination := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID, FileMapfile)
+	destination := filepath.Join(pd.PathWorkdir, pd.PathMaps, pmData.Data.ID, pd.FileMapfile)
 	if err := os.Rename(zipfile, destination); err != nil {
 		bResult.BuildSuccessful = "no"
 		bResult.BuildMessage = "error moving zipped map to download location"
@@ -402,13 +386,13 @@ func buildMap(tempdir string, order string) {
 /*
 setBuildResult sets the result state of the map build process
 */
-func setBuildResult(pmState PrintmapsState, bResult BuildResult) error {
+func setBuildResult(pmState pd.PrintmapsState, bResult BuildResult) error {
 
 	// write (update) state (map build completed)
 	pmState.Data.Attributes.MapBuildCompleted = time.Now().Format(time.RFC3339)
 	pmState.Data.Attributes.MapBuildSuccessful = bResult.BuildSuccessful
 	pmState.Data.Attributes.MapBuildMessage = bResult.BuildMessage
-	if err := writeMapstate(pmState); err != nil {
+	if err := pd.WriteMapstate(pmState); err != nil {
 		log.Printf("error <%v> at writeMapstate(), pmState = <%#v>", err, pmState)
 		return err
 	}
@@ -419,9 +403,9 @@ func setBuildResult(pmState PrintmapsState, bResult BuildResult) error {
 /*
 dumpPrintmapsData dumps (formats) a PrintmapsData object
 */
-func dumpPrintmapsData(pmData PrintmapsData) string {
+func dumpPrintmapsData(pmData pd.PrintmapsData) string {
 
-	dump, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+	dump, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 		log.Printf("%s", message)
@@ -433,9 +417,9 @@ func dumpPrintmapsData(pmData PrintmapsData) string {
 /*
 dumpPrintmapsState dumps (formats) a PrintmapsState object
 */
-func dumpPrintmapsState(pmState PrintmapsState) string {
+func dumpPrintmapsState(pmState pd.PrintmapsState) string {
 
-	dump, err := json.MarshalIndent(pmState, indentPrefix, indexString)
+	dump, err := json.MarshalIndent(pmState, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 		log.Printf("%s", message)
@@ -447,7 +431,7 @@ func dumpPrintmapsState(pmState PrintmapsState) string {
 /*
 readOrder reads the map order (meta) data
 */
-func readOrder(pmData *PrintmapsData, file string) error {
+func readOrder(pmData *pd.PrintmapsData, file string) error {
 
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -469,8 +453,8 @@ writeMetrics writes a simple metrics string into the log
 */
 func writeMetrics(tempdir string, order string, elapsed time.Duration) {
 
-	var pmData PrintmapsData
-	var pmState PrintmapsState
+	var pmData pd.PrintmapsData
+	var pmState pd.PrintmapsState
 
 	// read meta data of map order
 	file := filepath.Join(tempdir, order)
@@ -480,7 +464,7 @@ func writeMetrics(tempdir string, order string, elapsed time.Duration) {
 	}
 
 	// read state
-	if err := readMapstate(&pmState, pmData.Data.ID); err != nil {
+	if err := pd.ReadMapstate(&pmState, pmData.Data.ID); err != nil {
 		if !os.IsNotExist(err) {
 			log.Printf("error <%v> at readMapstate()", err)
 			log.Printf("pmData = %v", dumpPrintmapsData(pmData))
@@ -491,7 +475,7 @@ func writeMetrics(tempdir string, order string, elapsed time.Duration) {
 	// determine filesize (of final zip file)
 	var filesize int64
 	if pmState.Data.Attributes.MapBuildSuccessful == "yes" {
-		file := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID, FileMapfile)
+		file := filepath.Join(pd.PathWorkdir, pd.PathMaps, pmData.Data.ID, pd.FileMapfile)
 		fileinfo, err := os.Stat(file)
 		if err == nil {
 			filesize = fileinfo.Size()

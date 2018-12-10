@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 /*
@@ -17,7 +18,7 @@ revealCapaService reveals the capabilities of this service
 */
 func revealCapaService(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 
-	content, err := json.MarshalIndent(pmFeature, indentPrefix, indexString)
+	content, err := json.MarshalIndent(pmFeature, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 		http.Error(writer, message, http.StatusInternalServerError)
@@ -36,7 +37,7 @@ revealCapaMapdata reveals the capabilities of the mapdata
 */
 func revealCapaMapdata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 
-	content, err := json.MarshalIndent(pPolygon, indentPrefix, indexString)
+	content, err := json.MarshalIndent(pPolygon, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 		http.Error(writer, message, http.StatusInternalServerError)

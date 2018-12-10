@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 /*
@@ -19,12 +20,12 @@ deleteMap deletes all data for a given map ID
 */
 func deleteMap(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	var pmData PrintmapsData
-	var pmErrorList PrintmapsErrorList
+	var pmData pd.PrintmapsData
+	var pmErrorList pd.PrintmapsErrorList
 
 	id := params.ByName("id")
 
-	if err := readMetadata(&pmData, id); err != nil {
+	if err := pd.ReadMetadata(&pmData, id); err != nil {
 		if os.IsNotExist(err) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		} else {
@@ -37,7 +38,7 @@ func deleteMap(writer http.ResponseWriter, request *http.Request, params httprou
 
 	if len(pmErrorList.Errors) == 0 {
 		// delete map directory
-		path := filepath.Join(PathWorkdir, PathMaps, id)
+		path := filepath.Join(pd.PathWorkdir, pd.PathMaps, id)
 		if err := os.RemoveAll(path); err != nil {
 			message := fmt.Sprintf("error <%v> at os.RemoveAll(), path = <%s>", err, path)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -48,7 +49,7 @@ func deleteMap(writer http.ResponseWriter, request *http.Request, params httprou
 		writer.WriteHeader(http.StatusNoContent)
 	} else {
 		// request not ok, response with error list
-		content, err := json.MarshalIndent(pmErrorList, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmErrorList, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -56,7 +57,7 @@ func deleteMap(writer http.ResponseWriter, request *http.Request, params httprou
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(content)

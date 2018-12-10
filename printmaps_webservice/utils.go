@@ -15,24 +15,25 @@ import (
 	"syscall"
 
 	pip "github.com/JamesMilnerUK/pip-go"
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 /*
 createMapOrder is a helper to create a (asynchronous) build order for the map defined in the meta data
 */
-func createMapOrder(pmData PrintmapsData) error {
+func createMapOrder(pmData pd.PrintmapsData) error {
 
-	file := filepath.Join(PathWorkdir, PathOrders, pmData.Data.ID) + ".json"
+	file := filepath.Join(pd.PathWorkdir, pd.PathOrders, pmData.Data.ID) + ".json"
 
 	// create directory if necessary
-	if _, err := os.Stat(PathOrders); os.IsNotExist(err) {
-		if err := os.MkdirAll(PathOrders, 0755); err != nil {
-			log.Printf("error <%v> at os.MkdirAll(), path = <%s>", err, PathOrders)
+	if _, err := os.Stat(pd.PathOrders); os.IsNotExist(err) {
+		if err := os.MkdirAll(pd.PathOrders, 0755); err != nil {
+			log.Printf("error <%v> at os.MkdirAll(), path = <%s>", err, pd.PathOrders)
 			return err
 		}
 	}
 
-	data, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+	data, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		log.Printf("error <%v> at json.MarshalIndent()", err)
 		return err

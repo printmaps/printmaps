@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 /*
@@ -20,10 +21,10 @@ updateMetadata updates (patches) the meta data for a given map ID
 */
 func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 
-	var pmErrorList PrintmapsErrorList
-	var pmDataPost PrintmapsData
-	var pmData PrintmapsData
-	var pmState PrintmapsState
+	var pmErrorList pd.PrintmapsErrorList
+	var pmDataPost pd.PrintmapsData
+	var pmData pd.PrintmapsData
+	var pmState pd.PrintmapsState
 
 	verifyContentType(request, &pmErrorList)
 	verifyAccept(request, &pmErrorList)
@@ -54,7 +55,7 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 
 	if len(pmErrorList.Errors) == 0 {
 		// request ok, response with updated data, persist data
-		if err := writeMetadata(pmData); err != nil {
+		if err := pd.WriteMetadata(pmData); err != nil {
 			message := fmt.Sprintf("error <%v> at writeMetadata()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
 			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
@@ -62,7 +63,7 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		}
 
 		pmData.Data.Attributes.UserFiles = userFiles
-		content, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -71,7 +72,7 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		}
 
 		// read state
-		if err := readMapstate(&pmState, id); err != nil {
+		if err := pd.ReadMapstate(&pmState, id); err != nil {
 			if !os.IsNotExist(err) {
 				message := fmt.Sprintf("error <%v> at readMapstate(), id = <%s>", err, id)
 				http.Error(writer, message, http.StatusInternalServerError)
@@ -87,24 +88,24 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		pmState.Data.Attributes.MapBuildCompleted = ""
 		pmState.Data.Attributes.MapBuildSuccessful = ""
 		pmState.Data.Attributes.MapBuildMessage = ""
-		pmState.Data.Attributes.MapBuildBoxMillimeter = BoxMillimeter{}
-		pmState.Data.Attributes.MapBuildBoxPixel = BoxPixel{}
-		pmState.Data.Attributes.MapBuildBoxProjection = BoxProjection{}
-		pmState.Data.Attributes.MapBuildBoxWGS84 = BoxWGS84{}
-		if err = writeMapstate(pmState); err != nil {
+		pmState.Data.Attributes.MapBuildBoxMillimeter = pd.BoxMillimeter{}
+		pmState.Data.Attributes.MapBuildBoxPixel = pd.BoxPixel{}
+		pmState.Data.Attributes.MapBuildBoxProjection = pd.BoxProjection{}
+		pmState.Data.Attributes.MapBuildBoxWGS84 = pd.BoxWGS84{}
+		if err = pd.WriteMapstate(pmState); err != nil {
 			message := fmt.Sprintf("error <%v> at updateMapstate()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
 			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusOK)
 		writer.Write(content)
 	} else {
 		// request not ok, response with error list
-		content, err := json.MarshalIndent(pmErrorList, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmErrorList, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -112,7 +113,7 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(content)

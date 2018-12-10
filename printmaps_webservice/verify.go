@@ -9,34 +9,35 @@ import (
 	"strings"
 
 	pip "github.com/JamesMilnerUK/pip-go"
+	"github.com/printmaps/printmaps/internal/pd"
 )
 
 /*
 verifyContentType verifies the media type for header field "Content-Type"
 */
-func verifyContentType(request *http.Request, pmErrorList *PrintmapsErrorList) {
+func verifyContentType(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 
 	mediaType := request.Header.Get("Content-Type")
-	if mediaType != JSONAPIMediaType {
-		appendError(pmErrorList, "1001", "expected http header field = Content-Type: "+JSONAPIMediaType, "")
+	if mediaType != pd.JSONAPIMediaType {
+		appendError(pmErrorList, "1001", "expected http header field = Content-Type: "+pd.JSONAPIMediaType, "")
 	}
 }
 
 /*
 verifyAccept verifies the media type for header field "Accept"
 */
-func verifyAccept(request *http.Request, pmErrorList *PrintmapsErrorList) {
+func verifyAccept(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 
 	mediaType := request.Header.Get("Accept")
-	if mediaType != JSONAPIMediaType {
-		appendError(pmErrorList, "1002", "expected http header field = Accept: "+JSONAPIMediaType, "")
+	if mediaType != pd.JSONAPIMediaType {
+		appendError(pmErrorList, "1002", "expected http header field = Accept: "+pd.JSONAPIMediaType, "")
 	}
 }
 
 /*
 verifyMetadata verifies the map meta data
 */
-func verifyMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
+func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList) {
 
 	var message string
 	var found bool
@@ -153,7 +154,7 @@ func verifyMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
 /*
 verifyRequiredMetadata verifies (only) the existence of the required map meta data
 */
-func verifyRequiredMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorList) {
+func verifyRequiredMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList) {
 
 	var missingAttributes []string
 
@@ -193,9 +194,9 @@ func verifyRequiredMetadata(pmData PrintmapsData, pmErrorList *PrintmapsErrorLis
 /*
 appendError append an error entry to the error list
 */
-func appendError(pmErrorList *PrintmapsErrorList, code string, detail string, mapID string) {
+func appendError(pmErrorList *pd.PrintmapsErrorList, code string, detail string, mapID string) {
 
-	var jaError PrintmapsError
+	var jaError pd.PrintmapsError
 
 	switch code {
 	case "1001":

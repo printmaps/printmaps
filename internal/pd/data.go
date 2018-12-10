@@ -1,6 +1,19 @@
-// Data structures, global constants, globals variables
+/*
+Purpose:
+- Printmaps Data: Data structures, global constants, globals variables.
 
-package main
+Description:
+- NN
+
+Releases:
+- 0.1.0 - 2018/06/07 : initial release
+
+Author:
+- Klaus Tockloth
+*/
+
+// Package pd (printmaps data) defeines general data structures, global constants, globals variables
+package pd
 
 import (
 	"encoding/json"
@@ -27,8 +40,8 @@ const (
 
 // JSON identation constants
 const (
-	indentPrefix = ""
-	indexString  = "    "
+	IndentPrefix = ""
+	IndexString  = "    "
 )
 
 // JSONAPI constants
@@ -147,9 +160,9 @@ type Mapstate struct {
 }
 
 /*
-writeMetadata writes the map meta data to a file
+WriteMetadata writes the map meta data to a file
 */
-func writeMetadata(pmData PrintmapsData) error {
+func WriteMetadata(pmData PrintmapsData) error {
 
 	// create directory if necessary
 	path := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID)
@@ -160,7 +173,7 @@ func writeMetadata(pmData PrintmapsData) error {
 		}
 	}
 
-	data, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+	data, err := json.MarshalIndent(pmData, IndentPrefix, IndexString)
 	if err != nil {
 		log.Printf("error <%v> at json.MarshalIndent()", err)
 		return err
@@ -171,9 +184,9 @@ func writeMetadata(pmData PrintmapsData) error {
 }
 
 /*
-readMetadata reads the map meta data
+ReadMetadata reads the map meta data
 */
-func readMetadata(pmData *PrintmapsData, id string) error {
+func ReadMetadata(pmData *PrintmapsData, id string) error {
 
 	file := filepath.Join(PathWorkdir, PathMaps, id, FileMetadata)
 	data, err := ioutil.ReadFile(file)
@@ -215,9 +228,9 @@ func readMetadata(pmData *PrintmapsData, id string) error {
 }
 
 /*
-writeMapstate writes (updates) the state of the map creation process
+WriteMapstate writes (updates) the state of the map creation process
 */
-func writeMapstate(pmState PrintmapsState) error {
+func WriteMapstate(pmState PrintmapsState) error {
 
 	// create directory if necessary
 	path := filepath.Join(PathWorkdir, PathMaps, pmState.Data.ID)
@@ -228,7 +241,7 @@ func writeMapstate(pmState PrintmapsState) error {
 		}
 	}
 
-	data, err := json.MarshalIndent(pmState, indentPrefix, indexString)
+	data, err := json.MarshalIndent(pmState, IndentPrefix, IndexString)
 	if err != nil {
 		log.Printf("error <%v> at json.MarshalIndent()", err)
 		return err
@@ -239,9 +252,9 @@ func writeMapstate(pmState PrintmapsState) error {
 }
 
 /*
-readMapstate reads the state of the map creation process
+ReadMapstate reads the state of the map creation process
 */
-func readMapstate(pmState *PrintmapsState, id string) error {
+func ReadMapstate(pmState *PrintmapsState, id string) error {
 
 	file := filepath.Join(PathWorkdir, PathMaps, id, FileMapstate)
 	data, err := ioutil.ReadFile(file)
@@ -260,9 +273,9 @@ func readMapstate(pmState *PrintmapsState, id string) error {
 }
 
 /*
-createDirectories creates the necessary directories
+CreateDirectories creates the necessary directories
 */
-func createDirectories() {
+func CreateDirectories() {
 
 	// create 'maps' directory if necessary
 	path := filepath.Join(PathWorkdir, PathMaps)

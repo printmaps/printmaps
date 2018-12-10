@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/printmaps/printmaps/internal/pd"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -20,9 +21,9 @@ createMetadata creates the meta data for a new map
 */
 func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 
-	var pmErrorList PrintmapsErrorList
-	var pmData PrintmapsData
-	var pmState PrintmapsState
+	var pmErrorList pd.PrintmapsErrorList
+	var pmData pd.PrintmapsData
+	var pmState pd.PrintmapsState
 
 	verifyContentType(request, &pmErrorList)
 	verifyAccept(request, &pmErrorList)
@@ -45,14 +46,14 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		}
 		pmData.Data.ID = universallyUniqueIdentifier.String()
 
-		if err := writeMetadata(pmData); err != nil {
+		if err := pd.WriteMetadata(pmData); err != nil {
 			message := fmt.Sprintf("error <%v> at writeMetadata()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
 			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
 			return
 		}
 
-		content, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at son.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -64,20 +65,20 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		pmState.Data.Type = "maps"
 		pmState.Data.ID = pmData.Data.ID
 		pmState.Data.Attributes.MapMetadataWritten = time.Now().Format(time.RFC3339)
-		if err = writeMapstate(pmState); err != nil {
+		if err = pd.WriteMapstate(pmState); err != nil {
 			message := fmt.Sprintf("error <%v> at updateMapstate()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
 			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusCreated)
 		writer.Write(content)
 	} else {
 		// request not ok, response with error list
-		content, err := json.MarshalIndent(pmErrorList, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmErrorList, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -85,7 +86,7 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(content)
@@ -97,10 +98,10 @@ createMapfile creates a (asynchronous) build order for the map defined in the me
 */
 func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 
-	var pmErrorList PrintmapsErrorList
-	var pmDataPost PrintmapsData
-	var pmData PrintmapsData
-	var pmState PrintmapsState
+	var pmErrorList pd.PrintmapsErrorList
+	var pmDataPost pd.PrintmapsData
+	var pmData pd.PrintmapsData
+	var pmState pd.PrintmapsState
 
 	verifyContentType(request, &pmErrorList)
 	verifyAccept(request, &pmErrorList)
@@ -115,7 +116,7 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 
 	if len(pmErrorList.Errors) == 0 {
 		// request ok, read meta data from file
-		if err := readMetadata(&pmData, id); err != nil {
+		if err := pd.ReadMetadata(&pmData, id); err != nil {
 			if os.IsNotExist(err) {
 				appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 			} else {
@@ -137,7 +138,7 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 			}
 
 			// read state
-			if err := readMapstate(&pmState, id); err != nil {
+			if err := pd.ReadMapstate(&pmState, id); err != nil {
 				if !os.IsNotExist(err) {
 					message := fmt.Sprintf("error <%v> at readMapstate(), id = <%s>", err, id)
 					http.Error(writer, message, http.StatusInternalServerError)
@@ -152,11 +153,11 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 			pmState.Data.Attributes.MapBuildCompleted = ""
 			pmState.Data.Attributes.MapBuildSuccessful = ""
 			pmState.Data.Attributes.MapBuildMessage = ""
-			pmState.Data.Attributes.MapBuildBoxMillimeter = BoxMillimeter{}
-			pmState.Data.Attributes.MapBuildBoxPixel = BoxPixel{}
-			pmState.Data.Attributes.MapBuildBoxProjection = BoxProjection{}
-			pmState.Data.Attributes.MapBuildBoxWGS84 = BoxWGS84{}
-			if err = writeMapstate(pmState); err != nil {
+			pmState.Data.Attributes.MapBuildBoxMillimeter = pd.BoxMillimeter{}
+			pmState.Data.Attributes.MapBuildBoxPixel = pd.BoxPixel{}
+			pmState.Data.Attributes.MapBuildBoxProjection = pd.BoxProjection{}
+			pmState.Data.Attributes.MapBuildBoxWGS84 = pd.BoxWGS84{}
+			if err = pd.WriteMapstate(pmState); err != nil {
 				message := fmt.Sprintf("error <%v> at updateMapstate()", err)
 				http.Error(writer, message, http.StatusInternalServerError)
 				log.Printf("Response %d - %s", http.StatusInternalServerError, message)
@@ -167,7 +168,7 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 
 	if len(pmErrorList.Errors) == 0 {
 		// request ok, response with data
-		content, err := json.MarshalIndent(pmData, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -175,13 +176,13 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusAccepted)
 		writer.Write(content)
 	} else {
 		// request not ok, response with error list
-		content, err := json.MarshalIndent(pmErrorList, indentPrefix, indexString)
+		content, err := json.MarshalIndent(pmErrorList, pd.IndentPrefix, pd.IndexString)
 		if err != nil {
 			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
 			http.Error(writer, message, http.StatusInternalServerError)
@@ -189,7 +190,7 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 			return
 		}
 
-		writer.Header().Set("Content-Type", JSONAPIMediaType)
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
 		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(content)
