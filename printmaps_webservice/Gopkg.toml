@@ -38,8 +38,8 @@
   name = "github.com/printmaps/printmaps"
 
 [[constraint]]
- branch = "master"
- name = "github.com/satori/go.uuid"
+ name = "github.com/gofrs/uuid"
+ version = "3.1.2"
 
 [[constraint]]
   name = "gopkg.in/yaml.v2"
