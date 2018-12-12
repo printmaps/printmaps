@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' style='isolation:isolate' viewBox='0 0 200 200' width='200' height='200'>
-<line x1='0' y1='0' x2='0' y2='200' stroke-width='2' stroke='#313538' />
-<line x1='50' y1='0' x2='50' y2='200' stroke-width='2' stroke='#313538' />
-<line x1='100' y1='0' x2='100' y2='200' stroke-width='2' stroke='#313538' />
-<line x1='150' y1='0' x2='150' y2='200' stroke-width='2' stroke='#313538' />
-<line x1='200' y1='0' x2='200' y2='200' stroke-width='2' stroke='#313538' />
-</svg>
