@@ -21,12 +21,13 @@ Releases:
 					   map projection setting added
 					   new helper 'runlua'
 - 0.3.1 - 2018/12/10 : refactoring (data.go as package)
+- 0.3.2 - 2019/01/21 : template modified
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017,2018 Klaus Tockloth
+- Copyright (c) 2017-2019 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -85,8 +86,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.1"
-	progDate    = "2018/12/10"
+	progVersion = "0.3.2"
+	progDate    = "2019/01/21"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -1546,7 +1547,7 @@ ServiceURL: http://printmaps-osm.de:8282/api/beta2/maps/
 # essential map attributes (required)
 # -----------------------------------
 
-# file format (currently only png)
+# file format (png, pdf, svg)
 Fileformat: png
 
 # scale as in "1:10000" (e.g. 10000, 25000)
