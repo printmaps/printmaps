@@ -4,6 +4,7 @@ Printmaps ist ein Webservice der die Erstellung großformatiger, OSM-basierter K
 
 * großformatige Karten in Druckqualität
 * verschiedene Kartenstile (osm-carto, schwarzplan+, ...)
+* verschiedene Dateiformate (png, pdf, svg)
 * aktuelle OpenStreetMap-Kartendaten
 * Kartendaten verfügbar für die gesamte Erdoberfläche
 * benutzerdefinierte Zusatzelemente (Rahmen, Gitter, Legende, Maßstabsbalken, ...)
@@ -23,11 +24,7 @@ Der Benutzer definiert zunächst lokal eine Printmaps-Steuerdatei (map.yaml), di
 
 ## Status
 
-Printmaps befindet sich aktuell im Status "Beta 2".
-
-## Einschränkungen
-
-Karten im PDF- oder SVG-Format werden im Moment nicht unterstützt. Die entsprechenden Programmteile sind nicht getestet.
+Printmaps befindet sich aktuell im Status Pre-Release "beta2-1 (release candidate)".
 
 ## Wie anfangen
 
