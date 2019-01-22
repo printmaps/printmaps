@@ -24,7 +24,7 @@ Der Benutzer definiert zunächst lokal eine Printmaps-Steuerdatei (map.yaml), di
 
 ## Status
 
-Printmaps befindet sich aktuell im Status Pre-Release "beta2-1 (release candidate)".
+Printmaps befindet sich aktuell im Status Pre-Release "beta2 (release candidate)".
 
 ## Wie anfangen
 
