@@ -22,6 +22,7 @@ Releases:
 					   new helper 'runlua'
 - 0.3.1 - 2018/12/10 : refactoring (data.go as package)
 - 0.3.2 - 2019/01/21 : template modified
+- 0.3.3 - 2019/01/22 : logic error fixed
 
 Author:
 - Klaus Tockloth
@@ -86,8 +87,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.2"
-	progDate    = "2019/01/21"
+	progVersion = "0.3.3"
+	progDate    = "2019/01/22"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -196,7 +197,6 @@ func main() {
 		checkMapIDFile()
 		delete()
 	} else if action == "capabilities" {
-		checkMapDefinitionFile()
 		fetch(action)
 	} else if action == "template" {
 		template()
@@ -227,6 +227,7 @@ func main() {
 	}
 
 	fmt.Printf("\n")
+	os.Exit(0)
 }
 
 /*
@@ -235,9 +236,10 @@ checkMapDefinitionFile checks if the map definition file exists
 func checkMapDefinitionFile() {
 
 	if _, err := os.Stat(mapDefinitionFile); os.IsNotExist(err) {
-		fmt.Printf("\nWARNING - PRECONDITION FAILED:\n")
+		fmt.Printf("\nERROR - PRECONDITION FAILED:\n")
 		fmt.Printf("- the map definition file <%s> doesn't exists\n", mapDefinitionFile)
 		fmt.Printf("- apply the 'template' action to create the file\n\n")
+		os.Exit(1)
 	}
 }
 
@@ -247,9 +249,10 @@ checkMapIDFile checks if the map id file exists
 func checkMapIDFile() {
 
 	if _, err := os.Stat(mapIDFile); os.IsNotExist(err) {
-		fmt.Printf("\nWARNING - PRECONDITION FAILED:\n")
+		fmt.Printf("\nERROR - PRECONDITION FAILED:\n")
 		fmt.Printf("- the map ID file <%s> doesn't exists\n", mapIDFile)
 		fmt.Printf("- apply the 'create' action to create the file\n\n")
+		os.Exit(1)
 	}
 }
 
@@ -323,7 +326,7 @@ create creates a new map
 func create() {
 
 	if mapID != "" {
-		fmt.Printf("nothing to do ... map ID file '%s' exists\n", mapIDFile)
+		fmt.Printf("\nnothing to do ... map ID file '%s' exists\n", mapIDFile)
 		return
 	}
 
@@ -536,12 +539,6 @@ func download() {
 	filename := "printmaps.zip"
 	requestURL := mapConfig.ServiceURL + "mapfile/" + mapID
 
-	file, err := os.Create(filename)
-	if err != nil {
-		log.Fatalf("error <%v> at os.Create(), file = <%s>", err, filename)
-	}
-	defer file.Close()
-
 	req, err := http.NewRequest("GET", requestURL, nil)
 	if err != nil {
 		log.Fatalf("error <%v> at http.NewRequest()", err)
@@ -557,10 +554,23 @@ func download() {
 	}
 	defer resp.Body.Close()
 
-	printResponse(resp, false)
+	expectedString := strconv.Itoa(http.StatusOK) + " " + http.StatusText(http.StatusOK)
+	if resp.Status == expectedString {
+		printResponse(resp, false)
+	} else {
+		printResponse(resp, true)
+		printSuccess(resp, http.StatusOK)
+		return
+	}
 
 	filesize := float64(resp.ContentLength) / (1024.0 * 1024.0)
 	fmt.Printf("downloading file '%s' (%.1f MB) ... ", filename, filesize)
+
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Fatalf("error <%v> at os.Create(), file = <%s>", err, filename)
+	}
+	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
@@ -576,12 +586,12 @@ delete deletes a map (server data and local map ID file)
 func delete() {
 
 	if mapID == "" {
-		fmt.Printf("nothing to do ... map ID empty\n")
+		fmt.Printf("\nnothing to do, map ID empty\n")
 		return
 	}
 
 	// delete server data
-	fmt.Printf("deleting server data ...\n")
+	fmt.Printf("\ndeleting server data ...\n")
 
 	requestURL := mapConfig.ServiceURL + mapID
 
@@ -604,7 +614,7 @@ func delete() {
 	printSuccess(resp, http.StatusNoContent)
 
 	// remove local map ID file
-	fmt.Printf("\nremoving local map ID file '%s' ... ", mapIDFile)
+	fmt.Printf("\nremoving local map ID file '%s' ...\n", mapIDFile)
 	err = os.Remove(mapIDFile)
 	if err != nil {
 		log.Fatalf("error <%v> at os.Remove()", mapIDFile)
@@ -675,9 +685,9 @@ template creates a map definition template for building a map
 */
 func template() {
 
-	fmt.Printf("creating map definition file '%s' ... ", mapDefinitionFile)
+	fmt.Printf("\ncreating map definition file '%s' ...\n", mapDefinitionFile)
 	if _, err := os.Stat(mapDefinitionFile); err == nil {
-		fmt.Printf("nothing done ... map definition file '%s' already exists\n", mapDefinitionFile)
+		fmt.Printf("nothing done, map definition file '%s' already exists\n", mapDefinitionFile)
 	} else {
 		err := ioutil.WriteFile(mapDefinitionFile, []byte(mapTemplate), 0666)
 		if err != nil {

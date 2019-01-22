@@ -14,12 +14,13 @@ Releases:
                        update data issue fixed
 - 0.3.1 - 2018/12/05 : error check for attribute projection added
 - 0.3.2 - 2018/12/10 : refactoring (data.go as package)
+- 0.3.3 - 2019/01/22 : ID verification added (critical defect)
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017,2018 Klaus Tockloth
+- Copyright (c) 2017-2019 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -134,8 +135,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.2"
-	progDate    = "2018/12/10"
+	progVersion = "0.3.3"
+	progDate    = "2019/01/22"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )

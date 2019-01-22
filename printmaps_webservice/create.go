@@ -114,6 +114,12 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 
 	id := pmDataPost.Data.ID
 
+	// verify ID
+	_, err = uuid.FromString(id)
+	if err != nil {
+		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
+	}
+
 	if len(pmErrorList.Errors) == 0 {
 		// request ok, read meta data from file
 		if err := pd.ReadMetadata(&pmData, id); err != nil {

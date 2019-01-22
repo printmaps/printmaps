@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/printmaps/printmaps/pd"
 )
@@ -25,14 +26,22 @@ func fetchMetadata(writer http.ResponseWriter, request *http.Request, params htt
 
 	id := params.ByName("id")
 
-	if err := pd.ReadMetadata(&pmData, id); err != nil {
-		if os.IsNotExist(err) {
-			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
-		} else {
-			message := fmt.Sprintf("error <%v> at readMetadata(), id = <%s>", err, id)
-			http.Error(writer, message, http.StatusInternalServerError)
-			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
-			return
+	// verify ID
+	_, err := uuid.FromString(id)
+	if err != nil {
+		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
+	}
+
+	if len(pmErrorList.Errors) == 0 {
+		if err := pd.ReadMetadata(&pmData, id); err != nil {
+			if os.IsNotExist(err) {
+				appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
+			} else {
+				message := fmt.Sprintf("error <%v> at readMetadata(), id = <%s>", err, id)
+				http.Error(writer, message, http.StatusInternalServerError)
+				log.Printf("Response %d - %s", http.StatusInternalServerError, message)
+				return
+			}
 		}
 	}
 
@@ -76,14 +85,22 @@ func fetchMapstate(writer http.ResponseWriter, request *http.Request, params htt
 
 	id := params.ByName("id")
 
-	if err := pd.ReadMapstate(&pmState, id); err != nil {
-		if os.IsNotExist(err) {
-			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
-		} else {
-			message := fmt.Sprintf("error <%v> at readMapstate(), id = <%s>", err, id)
-			http.Error(writer, message, http.StatusInternalServerError)
-			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
-			return
+	// verify ID
+	_, err := uuid.FromString(id)
+	if err != nil {
+		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
+	}
+
+	if len(pmErrorList.Errors) == 0 {
+		if err := pd.ReadMapstate(&pmState, id); err != nil {
+			if os.IsNotExist(err) {
+				appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
+			} else {
+				message := fmt.Sprintf("error <%v> at readMapstate(), id = <%s>", err, id)
+				http.Error(writer, message, http.StatusInternalServerError)
+				log.Printf("Response %d - %s", http.StatusInternalServerError, message)
+				return
+			}
 		}
 	}
 
@@ -128,14 +145,22 @@ func fetchMapfile(writer http.ResponseWriter, request *http.Request, params http
 
 	id := params.ByName("id")
 
-	if err := pd.ReadMetadata(&pmData, id); err != nil {
-		if os.IsNotExist(err) {
-			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
-		} else {
-			message := fmt.Sprintf("error <%v> at readMetadata(), id = <%s>", err, id)
-			http.Error(writer, message, http.StatusInternalServerError)
-			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
-			return
+	// verify ID
+	_, err := uuid.FromString(id)
+	if err != nil {
+		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
+	}
+
+	if len(pmErrorList.Errors) == 0 {
+		if err := pd.ReadMetadata(&pmData, id); err != nil {
+			if os.IsNotExist(err) {
+				appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
+			} else {
+				message := fmt.Sprintf("error <%v> at readMetadata(), id = <%s>", err, id)
+				http.Error(writer, message, http.StatusInternalServerError)
+				log.Printf("Response %d - %s", http.StatusInternalServerError, message)
+				return
+			}
 		}
 	}
 

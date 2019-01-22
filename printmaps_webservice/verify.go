@@ -251,6 +251,10 @@ func appendError(pmErrorList *pd.PrintmapsErrorList, code string, detail string,
 		jaError.Status = strconv.Itoa(http.StatusUnprocessableEntity) + " " + http.StatusText(http.StatusUnprocessableEntity)
 		jaError.Source.Pointer = "data.attributes.projection"
 		jaError.Title = "invalid attribute projection"
+	case "4001":
+		jaError.Status = strconv.Itoa(http.StatusNotFound) + " " + http.StatusText(http.StatusNotFound)
+		jaError.Source.Pointer = "id"
+		jaError.Title = "id invalid (not an uuid)"
 	case "4002":
 		jaError.Status = strconv.Itoa(http.StatusNotFound) + " " + http.StatusText(http.StatusNotFound)
 		jaError.Source.Pointer = "id"

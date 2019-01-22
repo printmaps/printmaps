@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/printmaps/printmaps/pd"
 )
@@ -43,6 +44,12 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 
 	id := pmDataPost.Data.ID
 	userFiles := ""
+
+	// verify ID
+	_, err = uuid.FromString(id)
+	if err != nil {
+		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
+	}
 
 	// the update data set must contains all map elements (changed + unchanged)
 	if len(pmErrorList.Errors) == 0 {
