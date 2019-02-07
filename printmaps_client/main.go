@@ -23,6 +23,7 @@ Releases:
 - 0.3.1 - 2018/12/10 : refactoring (data.go as package)
 - 0.3.2 - 2019/01/21 : template modified
 - 0.3.3 - 2019/01/22 : logic error fixed
+- 0.3.4 - 2019/02/07 : client timeout setting removed
 
 Author:
 - Klaus Tockloth
@@ -72,7 +73,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/StefanSchroeder/Golang-Ellipsoid/ellipsoid"
 	"github.com/davecgh/go-spew/spew"
@@ -87,8 +87,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.3"
-	progDate    = "2019/01/22"
+	progVersion = "0.3.4"
+	progDate    = "2019/02/07"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -112,9 +112,7 @@ var (
 )
 
 // http client
-var netClient = &http.Client{
-	Timeout: time.Second * 180,
-}
+var netClient = &http.Client{}
 
 /*
 init initializes this program
