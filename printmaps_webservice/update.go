@@ -51,6 +51,13 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
 	}
 
+	// map directory must exist
+	if len(pmErrorList.Errors) == 0 {
+		if pd.IsExistMapDirectory(id) == false {
+			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
+		}
+	}
+
 	// the update data set must contains all map elements (changed + unchanged)
 	if len(pmErrorList.Errors) == 0 {
 		if err = json.Unmarshal(bodyBytes, &pmData); err != nil {
