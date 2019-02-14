@@ -24,6 +24,7 @@ Releases:
 - 0.3.2 - 2019/01/21 : template modified
 - 0.3.3 - 2019/01/22 : logic error fixed
 - 0.3.4 - 2019/02/07 : client timeout setting removed
+- 0.3.5 - 2019/02/14 : map definition template enhanced
 
 Author:
 - Klaus Tockloth
@@ -87,8 +88,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.4"
-	progDate    = "2019/02/07"
+	progVersion = "0.3.5"
+	progDate    = "2019/02/14"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -1569,9 +1570,15 @@ PrintHeight: 594.0
 Latitude: 53.5459
 Longitude: 9.9836
 
-# style / design (osm-carto, osm-carto-mono, osm-carto-ele20, schwarzplan, schwarzplan+, raster10)
-# raster10 (no map data): useful for placing / styling the user map elements
-# request the service capabilities to get a list of all available map styles
+# style / design (osm-carto, osm-carto-mono, osm-carto-ele20, schwarzplan, schwarzplan+, raster10, transparent)
+# osm-carto: OpenStreetMap Carto Style
+# osm-carto-mono: OpenStreetMap Carto Monochrome Style
+# osm-carto-ele20: OpenStreetMap Carto Elevation Style (20 m)
+# schwarzplan: Figure Ground Plan (buildings)
+# schwarzplan+: Figure Ground Plan Plus (buildings, water areas, highways)
+# raster10: Map canvas divided into a 10x10 raster
+# transparent: Transparent map canvas
+# request service capabilities to get a list of all available map styles
 Style: osm-carto
 
 # map projection, EPSG code as number (without prefix "EPSG:")
