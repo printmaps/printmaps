@@ -27,11 +27,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4aee6478a4976e0f70cc8e3823182a11003f7610f8a8dce354acbe480b811ee6"
+  digest = "1:398b0c0d0d6e128e3eb1cf2714af91fe60388dcbe868e3ace9ec5730ff5e3b74"
   name = "github.com/printmaps/printmaps"
   packages = ["pd"]
   pruneopts = "UT"
-  revision = "2c24c5937ee19d63a06057233a576ee191297640"
+  revision = "898a2f764220561ca241f259a3dd2e9a83ab962a"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
