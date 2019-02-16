@@ -15,6 +15,7 @@ Releases:
 - 0.3.1 - 2018/12/05 : error check for attribute projection added
 - 0.3.2 - 2018/12/10 : refactoring (data.go as package)
 - 0.3.3 - 2019/01/22 : ID verification added (critical defect)
+- 0.3.4 - 2019/02/16 : check existence of map directory added
 
 Author:
 - Klaus Tockloth
@@ -135,8 +136,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.3"
-	progDate    = "2019/01/22"
+	progVersion = "0.3.4"
+	progDate    = "2019/02/16"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )

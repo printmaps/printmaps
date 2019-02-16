@@ -7,6 +7,7 @@ Description:
 
 Releases:
 - 0.1.0 - 2018/06/07 : initial release
+- 0.2.0 - 2019/02/14 : function IsExistMapDirectory() added
 
 Author:
 - Klaus Tockloth
@@ -292,4 +293,14 @@ func CreateDirectories() {
 			log.Fatalf("fatal error <%v> at os.MkdirAll(), path = <%s>", err, path)
 		}
 	}
+}
+
+/*
+IsExistMapDirectory verifies if map directory exist
+*/
+func IsExistMapDirectory(mapID string) bool {
+
+	path := filepath.Join(PathWorkdir, PathMaps, mapID)
+	_, err := os.Stat(path)
+	return os.IsExist(err)
 }

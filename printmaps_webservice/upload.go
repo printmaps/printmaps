@@ -35,6 +35,13 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
 	}
 
+	// map directory must exist
+	if len(pmErrorList.Errors) == 0 {
+		if pd.IsExistMapDirectory(id) == false {
+			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
+		}
+	}
+
 	if len(pmErrorList.Errors) == 0 {
 		if err := pd.ReadMetadata(&pmData, id); err != nil {
 			if os.IsNotExist(err) {
