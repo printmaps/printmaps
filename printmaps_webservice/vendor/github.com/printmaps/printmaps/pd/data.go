@@ -303,6 +303,13 @@ func IsExistMapDirectory(mapID string) bool {
 	path := filepath.Join(PathWorkdir, PathMaps, mapID)
 	_, err := os.Stat(path)
 
-	log.Printf("path: %s, err: %v, os.IsExist(err): %v", path, err, os.IsExist(err))
-	return os.IsExist(err)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		log.Printf("error <%v> at os.Stat(), path = <%s>", err, path)
+		return false
+	}
+
+	return true
 }
