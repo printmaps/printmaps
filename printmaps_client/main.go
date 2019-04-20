@@ -25,6 +25,8 @@ Releases:
 - 0.3.3 - 2019/01/22 : logic error fixed
 - 0.3.4 - 2019/02/07 : client timeout setting removed
 - 0.3.5 - 2019/02/14 : map definition template enhanced
+- 0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
+
 
 Author:
 - Klaus Tockloth
@@ -88,8 +90,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.5"
-	progDate    = "2019/02/14"
+	progVersion = "0.3.6"
+	progDate    = "2019/04/20"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -128,6 +130,8 @@ func init() {
 main starts this program
 */
 func main() {
+
+	_, progName = filepath.Split(progName)
 
 	if len(os.Args) == 1 {
 		printUsage()
@@ -325,7 +329,8 @@ create creates a new map
 func create() {
 
 	if mapID != "" {
-		fmt.Printf("\nnothing to do ... map ID file '%s' exists\n", mapIDFile)
+		fmt.Printf("\nnothing to do ... '%s' already exists\n", mapIDFile)
+		fmt.Printf("use '%s update' to update '%s'\n", progName, mapDefinitionFile)
 		return
 	}
 
