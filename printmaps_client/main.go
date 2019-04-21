@@ -26,6 +26,7 @@ Releases:
 - 0.3.4 - 2019/02/07 : client timeout setting removed
 - 0.3.5 - 2019/02/14 : map definition template enhanced
 - 0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
+- 0.3.7 - 2019/04/21 : help text improved
 
 
 Author:
@@ -90,8 +91,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.6"
-	progDate    = "2019/04/20"
+	progVersion = "0.3.7"
+	progDate    = "2019/04/21"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -265,10 +266,10 @@ printUsage prints the usage of this program
 func printUsage() {
 
 	fmt.Printf("\nProgram:\n")
-	fmt.Printf("  Name    : %s\n", progName)
-	fmt.Printf("  Release : %s - %s\n", progVersion, progDate)
-	fmt.Printf("  Purpose : %s\n", progPurpose)
-	fmt.Printf("  Info    : %s\n", progInfo)
+	fmt.Printf("  Name         : %s\n", progName)
+	fmt.Printf("  Release      : %s - %s\n", progVersion, progDate)
+	fmt.Printf("  Purpose      : %s\n", progPurpose)
+	fmt.Printf("  Info         : %s\n", progInfo)
 
 	fmt.Printf("\nUsage:\n")
 	fmt.Printf("  %s <action>\n", progName)
@@ -277,14 +278,14 @@ func printUsage() {
 	fmt.Printf("  %s create\n", progName)
 
 	fmt.Printf("\nActions:\n")
-	fmt.Printf("  Primary   : create, update, upload, order, state, download\n")
-	fmt.Printf("  Secondary : data, delete, capabilities\n")
-	fmt.Printf("  Helper    : template\n")
-	fmt.Printf("  Helper    : passepartout, rectangle, cropmarks\n")
-	fmt.Printf("  Helper    : latlongrid, utmgrid\n")
-	fmt.Printf("  Helper    : latlon2utm, utm2latlon\n")
-	fmt.Printf("  Helper    : bearingline, latlonline, utmline\n")
-	fmt.Printf("  Helper    : runlua\n")
+	fmt.Printf("  Primary      : create, update, upload, order, state, download\n")
+	fmt.Printf("  Secondary    : data, delete, capabilities\n")
+	fmt.Printf("  Helper       : template\n")
+	fmt.Printf("  Helper       : passepartout, rectangle, cropmarks\n")
+	fmt.Printf("  Helper       : latlongrid, utmgrid\n")
+	fmt.Printf("  Helper       : latlon2utm, utm2latlon\n")
+	fmt.Printf("  Helper       : bearingline, latlonline, utmline\n")
+	fmt.Printf("  Helper       : runlua\n")
 
 	fmt.Printf("\nRemarks:\n")
 	fmt.Printf("  create       : creates the meta data for a new map\n")
@@ -308,6 +309,10 @@ func printUsage() {
 	fmt.Printf("  latlonline   : creates geographic line in geojson format\n")
 	fmt.Printf("  utmline      : creates geographic line in geojson format\n")
 	fmt.Printf("  runlua       : run lua 5.1 script for generating labels\n")
+
+	fmt.Printf("\nFiles:\n")
+	fmt.Printf("  %-13s: unique map identifier\n", mapIDFile)
+	fmt.Printf("  %-13s: map definition parameters\n", mapDefinitionFile)
 
 	fmt.Printf("\nHow to start:\n")
 	fmt.Printf("  - Start with creating a new directory on your local system.\n")
