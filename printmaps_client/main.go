@@ -28,7 +28,6 @@ Releases:
 - 0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
 - 0.3.7 - 2019/04/21 : help text improved
 
-
 Author:
 - Klaus Tockloth
 
