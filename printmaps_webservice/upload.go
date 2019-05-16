@@ -88,7 +88,7 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 		}
 		userfileSize = bytesWritten
 
-		filelimit := int64(48 * 1024 * 1024)
+		filelimit := int64(224 * 1024 * 1024)
 		removeUserfile := false
 		if userfileSize > filelimit {
 			log.Printf("user file <%s> (%d bytes) exceeds upload limit", filename, userfileSize)
