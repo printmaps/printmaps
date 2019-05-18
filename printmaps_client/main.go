@@ -27,6 +27,7 @@ Releases:
 - 0.3.5 - 2019/02/14 : map definition template enhanced
 - 0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
 - 0.3.7 - 2019/04/21 : help text improved
+- 0.4.0 - 2019/05/18 : template modified
 
 Author:
 - Klaus Tockloth
@@ -90,8 +91,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.3.7"
-	progDate    = "2019/04/21"
+	progVersion = "0.4.0"
+	progDate    = "2019/05/18"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -1543,14 +1544,18 @@ var mapTemplate = `# map definition file
 # author : 
 # release: 
 #
-# frame (2 + 18 = bleed + frame):
-# printmaps passepartout 420.0 594.0 20.0 20.0 20.0 20.0
+# frame (2 + 18 = bleed + frame): generate frame and border
+# - printmaps passepartout 420.0 594.0 20.0 20.0 20.0 20.0
 #
-# crop marks:
-# printmaps cropmarks 420.0 594.0 5.0
+# crop marks: generate crop marks for all four corners
+# - printmaps cropmarks 420.0 594.0 5.0
 #
-# scalebar:
-# printmaps bearingline 53.49777 9.93321 90.0 1000.0 "1000 Meter" scalebar-1000
+# scale bar: generate scale bar (nature length 2000 meters)
+# - printmaps bearingline 54.82 8.50 90.0 2000.0 "2000 Meter" scalebar-2000
+# - uncomment sections marked as 'scale bar'
+#
+# track: print user provided GPX track onto the map
+# - uncomment sections marked as 'track'
 
 # service configuration
 # ---------------------
@@ -1569,15 +1574,15 @@ ServiceURL: http://printmaps-osm.de:8282/api/beta2/maps/
 Fileformat: png
 
 # scale as in "1:10000" (e.g. 10000, 25000)
-Scale: 20000
+Scale: 50000
 
 # width and height (millimeter, e.g. 609.6)
 PrintWidth: 420.0
 PrintHeight: 594.0
 
 # center coordinates (decimal degrees, e.g. 51.9506)
-Latitude: 53.5459
-Longitude: 9.9836
+Latitude: 54.94
+Longitude: 8.39
 
 # style / design (osm-carto, osm-carto-mono, osm-carto-ele20, schwarzplan, schwarzplan+, raster10, transparent)
 # osm-carto: OpenStreetMap Carto Style
@@ -1605,7 +1610,8 @@ Projection: 3857
 # e.g. hide nature reserve borders: nature-reserve-boundaries,nature-reserve-text
 # e.g. hide tourism borders (theme park, zoo): tourism-boundary
 # e.g. hide highway shields: roads-text-ref-low-zoom,roads-text-ref
-HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text
+# e.g. hide aera texts: text-poly-low-zoom,text-poly
+HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text,nature-reserve-boundaries,nature-reserve-text
 
 # user defined objects (optional, draw order remains)
 # ---------------------------------------------------
@@ -1632,20 +1638,21 @@ HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text
 
 UserObjects:
 
-#- Style: <LineSymbolizer stroke='firebrick' stroke-width='8' stroke-linecap='round' />
+# 'track'
+#- Style: <LineSymbolizer stroke='firebrick' stroke-width='4' stroke-linecap='round' />
 #  SRS: '+init=epsg:4326'
 #  Type: ogr
 #  File: mytrack.gpx
 #  Layer: tracks
 
-# scale bar (use always stroke-linecap='butt')
-- Style: |
-         <LineSymbolizer stroke='dimgray' stroke-width='4.0' stroke-linecap='butt' />
-         <TextSymbolizer fontset-name='fontset-2' size='12' fill='dimgray' halo-radius='1' halo-fill='rgba(255, 255, 255, 0.6)' placement='line' dy='-6' allow-overlap='true'>[name]</TextSymbolizer>
-  SRS: '+init=epsg:4326'
-  Type: ogr
-  File: scalebar-1000.geojson
-  Layer: OGRGeoJSON
+# 'scale bar' (use always stroke-linecap='butt')
+#- Style: |
+#         <LineSymbolizer stroke='dimgray' stroke-width='4.0' stroke-linecap='butt' />
+#         <TextSymbolizer fontset-name='fontset-2' size='12' fill='dimgray' halo-radius='1' halo-fill='rgba(255, 255, 255, 0.6)' placement='line' dy='-6' allow-overlap='true'>[name]</TextSymbolizer>
+#  SRS: '+init=epsg:4326'
+#  Type: ogr
+#  File: scalebar-2000.geojson
+#  Layer: OGRGeoJSON
 
 # frame
 - Style: <PolygonSymbolizer fill='white' fill-opacity='1.0' /> 
@@ -1660,8 +1667,8 @@ UserObjects:
   WellKnownText: MULTILINESTRING((5.0 0.0, 0.0 0.0, 0.0 5.0), (5.0 594.0, 0.0 594.0, 0.0 589.0), (415.0 594.0, 420.0 594.0, 420.0 589.0), (415.0 0.0, 420.0 0.0, 420.0 5.0))
 
 # title
-- Style: <TextSymbolizer fontset-name='fontset-2' size='150' fill='dimgray' opacity='0.3' allow-overlap='true'>'H A M B U R G'</TextSymbolizer>
-  WellKnownText: POINT(210.0 510.0)
+- Style: <TextSymbolizer fontset-name='fontset-2' size='100' fill='dimgray' opacity='0.2' allow-overlap='true'>'Sylt'</TextSymbolizer>
+  WellKnownText: POINT(90.0 530.0)
 
 # copyright
 - Style: <TextSymbolizer fontset-name='fontset-0' size='12' fill='dimgray' orientation='90' allow-overlap='true'>'© OpenStreetMap contributors'</TextSymbolizer>
@@ -1671,6 +1678,8 @@ UserObjects:
 # --------------------
 
 UserFiles:
+# 'track'
 #- mytrack.gpx
-- scalebar-1000.geojson
+# 'scale bar'
+#- scalebar-2000.geojson
 `
