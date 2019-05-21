@@ -28,6 +28,8 @@ Releases:
 - 0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
 - 0.3.7 - 2019/04/21 : help text improved
 - 0.4.0 - 2019/05/18 : template modified
+- 0.4.1 - 2019/05/19 : typo in template fixed
+- 0.5.0 - 2019/05/21 : unzip action implemented
 
 Author:
 - Klaus Tockloth
@@ -64,6 +66,7 @@ Links:
 package main
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -91,8 +94,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.4.0"
-	progDate    = "2019/05/18"
+	progVersion = "0.5.0"
+	progDate    = "2019/05/21"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -204,6 +207,8 @@ func main() {
 		fetch(action)
 	} else if action == "template" {
 		template()
+	} else if action == "unzip" {
+		unzip()
 	} else if action == "passepartout" {
 		passepartout()
 	} else if action == "rectangle" {
@@ -280,7 +285,7 @@ func printUsage() {
 	fmt.Printf("\nActions:\n")
 	fmt.Printf("  Primary      : create, update, upload, order, state, download\n")
 	fmt.Printf("  Secondary    : data, delete, capabilities\n")
-	fmt.Printf("  Helper       : template\n")
+	fmt.Printf("  Helper       : template, unzip\n")
 	fmt.Printf("  Helper       : passepartout, rectangle, cropmarks\n")
 	fmt.Printf("  Helper       : latlongrid, utmgrid\n")
 	fmt.Printf("  Helper       : latlon2utm, utm2latlon\n")
@@ -298,6 +303,7 @@ func printUsage() {
 	fmt.Printf("  delete       : deletes all artifacts (files) of the map\n")
 	fmt.Printf("  capabilities : fetches the capabilities of the map service\n")
 	fmt.Printf("  template     : creates a template file for building a map\n")
+	fmt.Printf("  unzip        : unzips the downloaded map file\n")
 	fmt.Printf("  passepartout : calculates wkt passe-partout from base values\n")
 	fmt.Printf("  rectangle    : calculates wkt rectangle from base values\n")
 	fmt.Printf("  cropmarks    : calculates wkt crop marks from base values\n")
@@ -703,6 +709,48 @@ func template() {
 			log.Fatalf("error <%v> at ioutil.WriteFile(), file = <%s>", err, mapDefinitionFile)
 		}
 		fmt.Printf("done\n")
+	}
+}
+
+/*
+unzip unzips downloaded map file
+*/
+func unzip() {
+
+	archive := "printmaps.zip"
+	fmt.Printf("\nExtracting archive %s ...\n", archive)
+	zipReader, err := zip.OpenReader(archive)
+	if err != nil {
+		log.Fatalf("error <%v> at zip.OpenReader(), archive = <%s>", err, archive)
+	}
+
+	for _, file := range zipReader.Reader.File {
+		zippedFile, err := file.Open()
+		if err != nil {
+			log.Fatalf("error <%v> at file.Open(), file = <%s>", err, file.Name)
+		}
+		defer zippedFile.Close()
+
+		extractedFilePath := filepath.Join("./", file.Name)
+		if file.FileInfo().IsDir() {
+			fmt.Println("  Directory created:", extractedFilePath)
+			err = os.MkdirAll(extractedFilePath, file.Mode())
+			if err != nil {
+				log.Fatalf("error <%v> at os.MkdirAll(), path = <%s>", err, extractedFilePath)
+			}
+		} else {
+			fmt.Println("  File extracted:", file.Name)
+			outputFile, err := os.OpenFile(extractedFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+			if err != nil {
+				log.Fatalf("error <%v> at os.OpenFile(), file = <%s>", err, file.Name)
+			}
+			defer outputFile.Close()
+
+			_, err = io.Copy(outputFile, zippedFile)
+			if err != nil {
+				log.Fatalf("error <%v> at io.Copy()", err)
+			}
+		}
 	}
 }
 
@@ -1610,7 +1658,7 @@ Projection: 3857
 # e.g. hide nature reserve borders: nature-reserve-boundaries,nature-reserve-text
 # e.g. hide tourism borders (theme park, zoo): tourism-boundary
 # e.g. hide highway shields: roads-text-ref-low-zoom,roads-text-ref
-# e.g. hide aera texts: text-poly-low-zoom,text-poly
+# e.g. hide area texts: text-poly-low-zoom,text-poly
 HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text,nature-reserve-boundaries,nature-reserve-text
 
 # user defined objects (optional, draw order remains)
