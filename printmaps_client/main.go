@@ -30,6 +30,7 @@ Releases:
 - 0.4.0 - 2019/05/18 : template modified
 - 0.4.1 - 2019/05/19 : typo in template fixed
 - 0.5.0 - 2019/05/21 : unzip action implemented
+- 0.5.1 - 2019/06/27 : template modified
 
 Author:
 - Klaus Tockloth
@@ -94,8 +95,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.5.0"
-	progDate    = "2019/05/21"
+	progVersion = "0.5.1"
+	progDate    = "2019/07/27"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -1655,11 +1656,11 @@ Projection: 3857
 
 # layers to hide (see service capabilities for possible values)
 # e.g. hide admin borders: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text
-# e.g. hide nature reserve borders: nature-reserve-boundaries,nature-reserve-text
+# e.g. hide nature reserve borders: protected-areas,protected-areas-text
 # e.g. hide tourism borders (theme park, zoo): tourism-boundary
 # e.g. hide highway shields: roads-text-ref-low-zoom,roads-text-ref
 # e.g. hide area texts: text-poly-low-zoom,text-poly
-HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text,nature-reserve-boundaries,nature-reserve-text
+HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text,protected-areas,protected-areas-text
 
 # user defined objects (optional, draw order remains)
 # ---------------------------------------------------
