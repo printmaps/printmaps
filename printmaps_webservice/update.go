@@ -21,7 +21,6 @@ import (
 updateMetadata updates (patches) the meta data for a given map ID
 */
 func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
-
 	var pmErrorList pd.PrintmapsErrorList
 	var pmDataPost pd.PrintmapsData
 	var pmData pd.PrintmapsData

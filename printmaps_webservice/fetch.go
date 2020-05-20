@@ -20,7 +20,6 @@ import (
 fetchMetadata fetches the meta data for a given map ID
 */
 func fetchMetadata(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
 	var pmErrorList pd.PrintmapsErrorList
 	var pmData pd.PrintmapsData
 
@@ -86,7 +85,6 @@ func fetchMetadata(writer http.ResponseWriter, request *http.Request, params htt
 fetchMapstate fetches the current state of the map creation process
 */
 func fetchMapstate(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
 	var pmErrorList pd.PrintmapsErrorList
 	var pmState pd.PrintmapsState
 
@@ -152,7 +150,6 @@ func fetchMapstate(writer http.ResponseWriter, request *http.Request, params htt
 fetchMapfile send the map file with the give map ID to the client
 */
 func fetchMapfile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
 	var pmErrorList pd.PrintmapsErrorList
 	var pmData pd.PrintmapsData
 	var pmState pd.PrintmapsState

@@ -23,7 +23,6 @@ import (
 uploadUserdata allows the upload of an user data file (e.g. gpx file)
 */
 func uploadUserdata(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
 	var pmData pd.PrintmapsData
 	var pmErrorList pd.PrintmapsErrorList
 
@@ -138,7 +137,6 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 verifyUploadedFile verifies if a file is 'secure' (using linux file command)
 */
 func verifyUploadedFile(filename string) error {
-
 	command := fmt.Sprintf("file %s", filename)
 	commandExitStatus, commandOutput, err := runCommand(command)
 	if err != nil {

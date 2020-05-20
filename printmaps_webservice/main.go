@@ -17,12 +17,13 @@ Releases:
 - 0.3.3 - 2019/01/22 : ID verification added (critical defect)
 - 0.3.4 - 2019/02/16 : check existence of map directory added
 - 0.4.0 - 2019/05/16 : file upload limit increased (48 -> 224 MB)
+- 0.5.0 - 2020/05/20 : CORS support for javascript file uploads
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017-2019 Klaus Tockloth
+- Copyright (c) 2017-2020 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -91,7 +92,6 @@ Logging:
 - It only contains service state and error informations.
 
 ToDo:
-- pdf+svg support
 - metrics
 
 Links:
@@ -118,6 +118,7 @@ import (
 	pip "github.com/JamesMilnerUK/pip-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/printmaps/printmaps/pd"
+	"github.com/rs/cors"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -137,8 +138,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.4.0"
-	progDate    = "2019/05/16"
+	progVersion = "0.5.0"
+	progDate    = "2020/05/20"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -202,7 +203,6 @@ var (
 init initializes this program
 */
 func init() {
-
 	// initialize logger
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
 }
@@ -211,7 +211,6 @@ func init() {
 main starts this program
 */
 func main() {
-
 	configfile := "printmaps_webservice.yaml"
 	if len(os.Args) > 1 {
 		configfile = os.Args[1]
@@ -332,7 +331,8 @@ func main() {
 	signal.Notify(stopChan, syscall.SIGINT)  // kill -SIGINT pid -> interrupt
 	signal.Notify(stopChan, syscall.SIGTERM) // kill -SIGTERM pid -> terminated
 
-	pmWebservice := &http.Server{Addr: config.Addr, Handler: router}
+	// with CORS support (Cross Origin Resource Sharing)
+	pmWebservice := &http.Server{Addr: config.Addr, Handler: cors.Default().Handler(router)}
 	go func() {
 		log.Printf("Listen for requests on port %s ...", config.Addr)
 		if err := pmWebservice.ListenAndServe(); err != nil {
@@ -359,15 +359,15 @@ func main() {
 middlewareHandler is a wrapper to catch all client requests
 */
 func middlewareHandler(nextFunction httprouter.Handle) httprouter.Handle {
-
 	return func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
 		// dump request before consuming
 		dumpedRequest := dumpRequest(request)
+		// log.Printf("Request %s", dumpedRequest)
 
 		// create response recorder and delegate request to the given handle
 		responseRecorder := httptest.NewRecorder()
 		nextFunction(responseRecorder, request, params)
+		// log.Printf("Response %s", dumpResponse(responseRecorder))
 
 		// log responses with status code 500 ("internal server error")
 		if responseRecorder.Code == http.StatusInternalServerError {
@@ -388,7 +388,6 @@ func middlewareHandler(nextFunction httprouter.Handle) httprouter.Handle {
 dumpRequest dumps a http request
 */
 func dumpRequest(request *http.Request) string {
-
 	dump, err := httputil.DumpRequest(request, true)
 	if err != nil {
 		return fmt.Sprintf("error <%v> at httputil.DumpRequest()", err)
@@ -400,7 +399,6 @@ func dumpRequest(request *http.Request) string {
 dumpResponse dumps a (recorded) http response
 */
 func dumpResponse(responseRecorder *httptest.ResponseRecorder) string {
-
 	dump := fmt.Sprintf("%v (%s)\n", responseRecorder.Code, http.StatusText(responseRecorder.Code))
 	for key, value := range responseRecorder.HeaderMap {
 		dump += fmt.Sprintf("%s %s\n", key, value)
@@ -413,7 +411,6 @@ func dumpResponse(responseRecorder *httptest.ResponseRecorder) string {
 showMaintenance shows the maintenance page and sends status code 503 (Service Unavailable)
 */
 func showMaintenance(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
-
 	content, err := ioutil.ReadFile(config.Maintenancefile)
 	if err != nil {
 		log.Printf("error <%v> at ioutil.ReadFile(), file = <%s>", err, config.Maintenancefile)

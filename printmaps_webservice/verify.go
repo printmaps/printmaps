@@ -16,7 +16,6 @@ import (
 verifyContentType verifies the media type for header field "Content-Type"
 */
 func verifyContentType(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
-
 	mediaType := request.Header.Get("Content-Type")
 	if mediaType != pd.JSONAPIMediaType {
 		appendError(pmErrorList, "1001", "expected http header field = Content-Type: "+pd.JSONAPIMediaType, "")
@@ -38,7 +37,6 @@ func verifyAccept(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 verifyMetadata verifies the map meta data
 */
 func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList) {
-
 	var message string
 	var found bool
 
@@ -155,7 +153,6 @@ func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList)
 verifyRequiredMetadata verifies (only) the existence of the required map meta data
 */
 func verifyRequiredMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList) {
-
 	var missingAttributes []string
 
 	// required map meta data (content already validated)
@@ -195,7 +192,6 @@ func verifyRequiredMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsEr
 appendError append an error entry to the error list
 */
 func appendError(pmErrorList *pd.PrintmapsErrorList, code string, detail string, mapID string) {
-
 	var jaError pd.PrintmapsError
 
 	switch code {

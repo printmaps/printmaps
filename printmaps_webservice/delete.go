@@ -20,7 +20,6 @@ import (
 deleteMap deletes all data for a given map ID
 */
 func deleteMap(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
 	var pmData pd.PrintmapsData
 	var pmErrorList pd.PrintmapsErrorList
 

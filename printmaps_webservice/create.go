@@ -20,7 +20,6 @@ import (
 createMetadata creates the meta data for a new map
 */
 func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
-
 	var pmErrorList pd.PrintmapsErrorList
 	var pmData pd.PrintmapsData
 	var pmState pd.PrintmapsState
@@ -97,7 +96,6 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 createMapfile creates a (asynchronous) build order for the map defined in the metadata
 */
 func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
-
 	var pmErrorList pd.PrintmapsErrorList
 	var pmDataPost pd.PrintmapsData
 	var pmData pd.PrintmapsData
