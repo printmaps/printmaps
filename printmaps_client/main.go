@@ -31,12 +31,13 @@ Releases:
 - 0.4.1 - 2019/05/19 : typo in template fixed
 - 0.5.0 - 2019/05/21 : unzip action implemented
 - 0.5.1 - 2019/06/27 : template modified
+- 0.5.2 - 2020/05/22 : template modified
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017-2019 Klaus Tockloth
+- Copyright (c) 2017-2020 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -95,8 +96,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.5.1"
-	progDate    = "2019/07/27"
+	progVersion = "0.5.2"
+	progDate    = "2020/05/22"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -1720,7 +1721,7 @@ UserObjects:
   WellKnownText: POINT(90.0 530.0)
 
 # copyright
-- Style: <TextSymbolizer fontset-name='fontset-0' size='12' fill='dimgray' orientation='90' allow-overlap='true'>'© OpenStreetMap contributors'</TextSymbolizer>
+- Style: <TextSymbolizer fontset-name='fontset-0' size='12' fill='dimgray' orientation='90' allow-overlap='true'>'© OpenStreetMap contributors (ODbL)'</TextSymbolizer>
   WellKnownText: POINT(10.0 297)
 
 # user files to upload
