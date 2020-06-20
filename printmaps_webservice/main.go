@@ -6,18 +6,19 @@ Description:
 - Webservice to build large printable maps based on OSM data.
 
 Releases:
-- 0.1.0 - 2017/05/23 : initial release (beta version)
-- 0.1.1 - 2017/05/26 : improvements
-- 0.1.2 - 2017/07/04 : problem with upload filename fixed
-- 0.2.0 - 2018/04/22 : support for full planet implemented
-- 0.3.0 - 2018/12/05 : service URL changed to beta2 (incompatible with beta)
+- v0.1.0 - 2017/05/23 : initial release (beta version)
+- v0.1.1 - 2017/05/26 : improvements
+- v0.1.2 - 2017/07/04 : problem with upload filename fixed
+- v0.2.0 - 2018/04/22 : support for full planet implemented
+- v0.3.0 - 2018/12/05 : service URL changed to beta2 (incompatible with beta)
                        update data issue fixed
-- 0.3.1 - 2018/12/05 : error check for attribute projection added
-- 0.3.2 - 2018/12/10 : refactoring (data.go as package)
-- 0.3.3 - 2019/01/22 : ID verification added (critical defect)
-- 0.3.4 - 2019/02/16 : check existence of map directory added
-- 0.4.0 - 2019/05/16 : file upload limit increased (48 -> 224 MB)
-- 0.5.0 - 2020/05/20 : CORS support for javascript file uploads
+- v0.3.1 - 2018/12/05 : error check for attribute projection added
+- v0.3.2 - 2018/12/10 : refactoring (data.go as package)
+- v0.3.3 - 2019/01/22 : ID verification added (critical defect)
+- v0.3.4 - 2019/02/16 : check existence of map directory added
+- v0.4.0 - 2019/05/16 : file upload limit increased (48 -> 224 MB)
+- v0.5.0 - 2020/05/20 : CORS support for javascript file uploads
+- v0.6.0 - 2020/06/20 : Post-as-Patch added
 
 Author:
 - Klaus Tockloth
@@ -138,8 +139,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.5.0"
-	progDate    = "2020/05/20"
+	progVersion = "v0.6.0"
+	progDate    = "2020/06/20"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -309,6 +310,7 @@ func main() {
 
 		// PATCH (update resource)
 		router.PATCH("/api/beta2/maps/metadata", middlewareHandler(updateMetadata))
+		router.POST("/api/beta2/maps/metadata/patch", middlewareHandler(updateMetadata)) // Post-as-Patch
 
 		// DELETE (delete resource)
 		router.DELETE("/api/beta2/maps/:id", middlewareHandler(deleteMap))
