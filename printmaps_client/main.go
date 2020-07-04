@@ -6,32 +6,33 @@ Description:
 - Creates large-sized maps in print quality.
 
 Releases:
-- 0.1.0 - 2017/05/23 : beta 1
-- 0.1.1 - 2017/05/26 : general improvements
-- 0.1.2 - 2017/05/28 : template improved
-- 0.1.3 - 2017/06/01 : textual corrections
-- 0.1.4 - 2017/06/27 : template modified
-- 0.1.5 - 2017/07/04 : problem with upload filepath fixed
-- 0.2.0 - 2018/10/24 : new helper 'coordgrid'
-- 0.3.0 - 2018/12/04 : helper 'coordgrid' renamed to 'latlongrid'
-					   helper 'rectangle' simplified
-					   new helper 'utmgrid', utm2latlon', latlon2utm'
-					   new helper 'bearingline', 'latlonline', 'utmline'
-					   new helper 'passepartout', 'cropmarks'
-					   map projection setting added
-					   new helper 'runlua'
-- 0.3.1 - 2018/12/10 : refactoring (data.go as package)
-- 0.3.2 - 2019/01/21 : template modified
-- 0.3.3 - 2019/01/22 : logic error fixed
-- 0.3.4 - 2019/02/07 : client timeout setting removed
-- 0.3.5 - 2019/02/14 : map definition template enhanced
-- 0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
-- 0.3.7 - 2019/04/21 : help text improved
-- 0.4.0 - 2019/05/18 : template modified
-- 0.4.1 - 2019/05/19 : typo in template fixed
-- 0.5.0 - 2019/05/21 : unzip action implemented
-- 0.5.1 - 2019/06/27 : template modified
-- 0.5.2 - 2020/05/22 : template modified
+- v0.1.0 - 2017/05/23 : beta 1
+- v0.1.1 - 2017/05/26 : general improvements
+- v0.1.2 - 2017/05/28 : template improved
+- v0.1.3 - 2017/06/01 : textual corrections
+- v0.1.4 - 2017/06/27 : template modified
+- v0.1.5 - 2017/07/04 : problem with upload filepath fixed
+- v0.2.0 - 2018/10/24 : new helper 'coordgrid'
+- v0.3.0 - 2018/12/04 : helper 'coordgrid' renamed to 'latlongrid'
+					    helper 'rectangle' simplified
+					    new helper 'utmgrid', utm2latlon', latlon2utm'
+					    new helper 'bearingline', 'latlonline', 'utmline'
+					    new helper 'passepartout', 'cropmarks'
+					    map projection setting added
+					    new helper 'runlua'
+- v0.3.1 - 2018/12/10 : refactoring (data.go as package)
+- v0.3.2 - 2019/01/21 : template modified
+- v0.3.3 - 2019/01/22 : logic error fixed
+- v0.3.4 - 2019/02/07 : client timeout setting removed
+- v0.3.5 - 2019/02/14 : map definition template enhanced
+- v0.3.6 - 2019/04/20 : hint at 'create()' added, path from 'progName' removed
+- v0.3.7 - 2019/04/21 : help text improved
+- v0.4.0 - 2019/05/18 : template modified
+- v0.4.1 - 2019/05/19 : typo in template fixed
+- v0.5.0 - 2019/05/21 : unzip action implemented
+- v0.5.1 - 2019/06/27 : template modified
+- v0.5.2 - 2020/05/22 : template modified
+- v0.5.3 - 2020/07/04 : typo in help text corrected
 
 Author:
 - Klaus Tockloth
@@ -96,8 +97,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.5.2"
-	progDate    = "2020/05/22"
+	progVersion = "v0.5.3"
+	progDate    = "2020/07/04"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -310,7 +311,7 @@ func printUsage() {
 	fmt.Printf("  rectangle    : calculates wkt rectangle from base values\n")
 	fmt.Printf("  cropmarks    : calculates wkt crop marks from base values\n")
 	fmt.Printf("  latlongrid   : creates lat/lon grid in geojson format\n")
-	fmt.Printf("  utmgrid      : careates utm grid in geojson format\n")
+	fmt.Printf("  utmgrid      : creates utm grid in geojson format\n")
 	fmt.Printf("  latlon2utm   : converts coordinates from lat/lon to utm\n")
 	fmt.Printf("  utm2latlon   : converts coordinates from utm to lat/lon\n")
 	fmt.Printf("  bearingline  : creates geographic line in geojson format\n")
