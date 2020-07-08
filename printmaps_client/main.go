@@ -33,6 +33,7 @@ Releases:
 - v0.5.1 - 2019/06/27 : template modified
 - v0.5.2 - 2020/05/22 : template modified
 - v0.5.3 - 2020/07/04 : typo in help text corrected
+- v0.5.4 - 2020/07/08 : minor correction
 
 Author:
 - Klaus Tockloth
@@ -97,8 +98,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.5.3"
-	progDate    = "2020/07/04"
+	progVersion = "v0.5.4"
+	progDate    = "2020/07/08"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -769,7 +770,7 @@ func passepartout() {
 		fmt.Printf("  %s passepartout  420.0  594.0  20.0  20.0  20.0  20.0\n", progName)
 		fmt.Printf("\nRemarks:\n")
 		fmt.Printf("  width = map width in millimeters\n")
-		fmt.Printf("  height = map width in millimeters\n")
+		fmt.Printf("  height = map height in millimeters\n")
 		fmt.Printf("  left = size of left border in millimeters\n")
 		fmt.Printf("  top = size of top border in millimeters\n")
 		fmt.Printf("  right = size of right border in millimeters\n")

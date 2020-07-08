@@ -19,6 +19,7 @@ Releases:
 - v0.4.0 - 2019/05/16 : file upload limit increased (48 -> 224 MB)
 - v0.5.0 - 2020/05/20 : CORS support for javascript file uploads
 - v0.6.0 - 2020/06/20 : Post-as-Patch added
+- v0.7.0 - 2020/07/06 : Post-as-Delete added
 
 Author:
 - Klaus Tockloth
@@ -139,8 +140,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.6.0"
-	progDate    = "2020/06/20"
+	progVersion = "v0.7.0"
+	progDate    = "2020/07/06"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -314,6 +315,7 @@ func main() {
 
 		// DELETE (delete resource)
 		router.DELETE("/api/beta2/maps/:id", middlewareHandler(deleteMap))
+		router.POST("/api/beta2/maps/delete/:id", middlewareHandler(deleteMap)) // Post-as-Delete
 
 		// service / mapdata capabilities
 		router.GET("/api/beta2/maps/capabilities/service", middlewareHandler(revealCapaService))
