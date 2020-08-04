@@ -34,6 +34,7 @@ Releases:
 - v0.5.2 - 2020/05/22 : template modified
 - v0.5.3 - 2020/07/04 : typo in help text corrected
 - v0.5.4 - 2020/07/08 : minor correction
+- v0.6.0 - 2020/08/03 : template removed
 
 Author:
 - Klaus Tockloth
@@ -98,8 +99,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.5.4"
-	progDate    = "2020/07/08"
+	progVersion = "v0.6.0"
+	progDate    = "2020/08/03"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -209,8 +210,6 @@ func main() {
 		delete()
 	} else if action == "capabilities" {
 		fetch(action)
-	} else if action == "template" {
-		template()
 	} else if action == "unzip" {
 		unzip()
 	} else if action == "passepartout" {
@@ -251,7 +250,6 @@ func checkMapDefinitionFile() {
 	if _, err := os.Stat(mapDefinitionFile); os.IsNotExist(err) {
 		fmt.Printf("\nERROR - PRECONDITION FAILED:\n")
 		fmt.Printf("- the map definition file <%s> doesn't exists\n", mapDefinitionFile)
-		fmt.Printf("- apply the 'template' action to create the file\n\n")
 		os.Exit(1)
 	}
 }
@@ -289,7 +287,7 @@ func printUsage() {
 	fmt.Printf("\nActions:\n")
 	fmt.Printf("  Primary      : create, update, upload, order, state, download\n")
 	fmt.Printf("  Secondary    : data, delete, capabilities\n")
-	fmt.Printf("  Helper       : template, unzip\n")
+	fmt.Printf("  Helper       : unzip\n")
 	fmt.Printf("  Helper       : passepartout, rectangle, cropmarks\n")
 	fmt.Printf("  Helper       : latlongrid, utmgrid\n")
 	fmt.Printf("  Helper       : latlon2utm, utm2latlon\n")
@@ -306,7 +304,6 @@ func printUsage() {
 	fmt.Printf("  data         : fetches the current meta data of the map\n")
 	fmt.Printf("  delete       : deletes all artifacts (files) of the map\n")
 	fmt.Printf("  capabilities : fetches the capabilities of the map service\n")
-	fmt.Printf("  template     : creates a template file for building a map\n")
 	fmt.Printf("  unzip        : unzips the downloaded map file\n")
 	fmt.Printf("  passepartout : calculates wkt passe-partout from base values\n")
 	fmt.Printf("  rectangle    : calculates wkt rectangle from base values\n")
@@ -325,13 +322,10 @@ func printUsage() {
 	fmt.Printf("  %-13s: map definition parameters\n", mapDefinitionFile)
 
 	fmt.Printf("\nHow to start:\n")
-	fmt.Printf("  - Start with creating a new directory on your local system.\n")
-	fmt.Printf("  - Change into this directory and run the 'template' action.\n")
-	fmt.Printf("  - This creates the default map definition file '%s'.\n", mapDefinitionFile)
-	fmt.Printf("  - You have now a full working example for building a map.\n")
-	fmt.Printf("  - Build the map in order to get familiar with this client.\n")
-	fmt.Printf("  - Run the actions 'create', 'order', 'state' and 'download'.\n")
-	fmt.Printf("  - Unzip the file and view it with an appropriate application.\n")
+	fmt.Printf("  - Download and unzip the 'template' map from 'printmaps-osm.de'.\n")
+	fmt.Printf("  - Build the 'template' map by running the actions:\n")
+	fmt.Printf("    'create', 'upload', 'order', 'state', 'download', 'unzip'\n")
+	fmt.Printf("  - View the map with an appropriate application.\n")
 	fmt.Printf("  - Modify the map definition file '%s' to your needs.\n", mapDefinitionFile)
 	fmt.Printf("\n")
 
@@ -696,23 +690,6 @@ func printSuccess(resp *http.Response, expectedStatus int) {
 		fmt.Printf("success\n")
 	} else {
 		fmt.Printf("FAILURE\n")
-	}
-}
-
-/*
-template creates a map definition template for building a map
-*/
-func template() {
-
-	fmt.Printf("\ncreating map definition file '%s' ...\n", mapDefinitionFile)
-	if _, err := os.Stat(mapDefinitionFile); err == nil {
-		fmt.Printf("nothing done, map definition file '%s' already exists\n", mapDefinitionFile)
-	} else {
-		err := ioutil.WriteFile(mapDefinitionFile, []byte(mapTemplate), 0666)
-		if err != nil {
-			log.Fatalf("error <%v> at ioutil.WriteFile(), file = <%s>", err, mapDefinitionFile)
-		}
-		fmt.Printf("done\n")
 	}
 }
 
@@ -1568,170 +1545,3 @@ func dumpData(writer io.Writer, objectname string, object interface{}) {
 		log.Fatalf("Fehler <%v> bei fmt.Fprintf", err)
 	}
 }
-
-var mapTemplate = `# map definition file
-# -------------------
-# general hint for this yaml config file:
-# - do not use tabs or unnecessary white spaces
-#
-# useful links:
-# - https://github.com/mapnik/mapnik/wiki/SymbologySupport
-# - http://mapnik.org/mapnik-reference
-#
-# basic symbolizers:
-# - LinePatternSymbolizer (https://github.com/mapnik/mapnik/wiki/LinePatternSymbolizer)
-# - LineSymbolizer (https://github.com/mapnik/mapnik/wiki/LineSymbolizer)
-# - MarkersSymbolizer (https://github.com/mapnik/mapnik/wiki/MarkersSymbolizer)
-# - PointSymbolizer (https://github.com/mapnik/mapnik/wiki/PointSymbolizer)
-# - PolygonPatternSymbolizer (https://github.com/mapnik/mapnik/wiki/PolygonPatternSymbolizer)
-# - PolygonSymbolizer (https://github.com/mapnik/mapnik/wiki/PolygonSymbolizer)
-# - TextSymbolizer (https://github.com/mapnik/mapnik/wiki/TextSymbolizer)
-#
-# advanced symbolizers:
-# - BuildingSymbolizer (https://github.com/mapnik/mapnik/wiki/BuildingSymbolizer)
-# - RasterSymbolizer (https://github.com/mapnik/mapnik/wiki/RasterSymbolizer)
-# - ShieldSymbolizer (https://github.com/mapnik/mapnik/wiki/ShieldSymbolizer)
-#
-# purpose: 
-# author : 
-# release: 
-#
-# frame (2 + 18 = bleed + frame): generate frame and border
-# - printmaps passepartout 420.0 594.0 20.0 20.0 20.0 20.0
-#
-# crop marks: generate crop marks for all four corners
-# - printmaps cropmarks 420.0 594.0 5.0
-#
-# scale bar: generate scale bar (nature length 2000 meters)
-# - printmaps bearingline 54.82 8.50 90.0 2000.0 "2000 Meter" scalebar-2000
-# - uncomment sections marked as 'scale bar'
-#
-# track: print user provided GPX track onto the map
-# - uncomment sections marked as 'track'
-
-# service configuration
-# ---------------------
-
-# URL of webservice
-ServiceURL: http://printmaps-osm.de:8282/api/beta2/maps/
-
-# proxy configuration (not to be done here)
-# - set the environment variable $HTTP_PROXY on your local system 
-# - e.g. export HTTP_PROXY=http://user:password@proxy.server:port
-
-# essential map attributes (required)
-# -----------------------------------
-
-# file format (png, pdf, svg)
-Fileformat: png
-
-# scale as in "1:10000" (e.g. 10000, 25000)
-Scale: 50000
-
-# width and height (millimeter, e.g. 609.6)
-PrintWidth: 420.0
-PrintHeight: 594.0
-
-# center coordinates (decimal degrees, e.g. 51.9506)
-Latitude: 54.94
-Longitude: 8.39
-
-# style / design (osm-carto, osm-carto-mono, osm-carto-ele20, schwarzplan, schwarzplan+, raster10, transparent)
-# osm-carto: OpenStreetMap Carto Style
-# osm-carto-mono: OpenStreetMap Carto Monochrome Style
-# osm-carto-ele20: OpenStreetMap Carto Elevation Style (20 m)
-# schwarzplan: Figure Ground Plan (buildings)
-# schwarzplan+: Figure Ground Plan Plus (buildings, water areas, highways)
-# raster10: Map canvas divided into a 10x10 raster
-# transparent: Transparent map canvas
-# request service capabilities to get a list of all available map styles
-Style: osm-carto
-
-# map projection, EPSG code as number (without prefix "EPSG:")
-# e.g. 3857 (EPSG:3857 / WGS84 / Web Mercator) (used by Google/Bing/OpenStreetMap)
-# e.g. 32632 (EPSG:32632 / WGS 84 / UTM Zone 32N)
-# e.g. 27700 (EPSG:27700 / OSGB 1936 / British National Grid)
-# e.g. 2056 (EPSG:2056 / CH1903+ / LV95)
-Projection: 3857
-
-# advanced map attributes (optional)
-# ----------------------------------
-
-# layers to hide (see service capabilities for possible values)
-# e.g. hide admin borders: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text
-# e.g. hide nature reserve borders: protected-areas,protected-areas-text
-# e.g. hide tourism borders (theme park, zoo): tourism-boundary
-# e.g. hide highway shields: roads-text-ref-low-zoom,roads-text-ref
-# e.g. hide area texts: text-poly-low-zoom,text-poly
-HideLayers: admin-low-zoom,admin-mid-zoom,admin-high-zoom,admin-text,protected-areas,protected-areas-text
-
-# user defined objects (optional, draw order remains)
-# ---------------------------------------------------
-#
-# data object defined by ...
-# style: object style
-# srs: spatial reference system (is always '+init=epsg:4326' for gpx and kml)
-# type: type of data source (ogr, shape, gdal, csv)
-# file: name of data objects file
-# layer: data layer to extract (only required for ogr)
-#
-# item object defined by ...
-# style: object style
-# well-known-text: object definition
-#
-# well-known-text:
-#   POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
-#   all values are in millimeter (reference X0 Y0: lower left map corner)
-#
-# font sets:
-#   fontset-0: Noto Fonts normal
-#   fontset-1: Noto Fonts italic
-#   fontset-2: Noto Fonts bold
-
-UserObjects:
-
-# 'track'
-#- Style: <LineSymbolizer stroke='firebrick' stroke-width='4' stroke-linecap='round' />
-#  SRS: '+init=epsg:4326'
-#  Type: ogr
-#  File: mytrack.gpx
-#  Layer: tracks
-
-# 'scale bar' (use always stroke-linecap='butt')
-#- Style: |
-#         <LineSymbolizer stroke='dimgray' stroke-width='4.0' stroke-linecap='butt' />
-#         <TextSymbolizer fontset-name='fontset-2' size='12' fill='dimgray' halo-radius='1' halo-fill='rgba(255, 255, 255, 0.6)' placement='line' dy='-6' allow-overlap='true'>[name]</TextSymbolizer>
-#  SRS: '+init=epsg:4326'
-#  Type: ogr
-#  File: scalebar-2000.geojson
-#  Layer: OGRGeoJSON
-
-# frame
-- Style: <PolygonSymbolizer fill='white' fill-opacity='1.0' /> 
-  WellKnownText: POLYGON((0.0 0.0, 0.0 594.0, 420.0 594.0, 420.0 0.0, 0.0 0.0), (20.0 20.0, 20.0 574.0, 400.0 574.0, 400.0 20.0, 20.0 20.0))
-
-# border (around map area)
-- Style: <LineSymbolizer stroke='dimgray' stroke-width='1.0' stroke-linecap='square' />
-  WellKnownText: LINESTRING(20.0 20.0, 20.0 574.0, 400.0 574.0, 400.0 20.0, 20.0 20.0)
-
-# crop marks (only the half line width is visible)
-- Style: <LineSymbolizer stroke='dimgray' stroke-width='1.5' stroke-linecap='square' />
-  WellKnownText: MULTILINESTRING((5.0 0.0, 0.0 0.0, 0.0 5.0), (5.0 594.0, 0.0 594.0, 0.0 589.0), (415.0 594.0, 420.0 594.0, 420.0 589.0), (415.0 0.0, 420.0 0.0, 420.0 5.0))
-
-# title
-- Style: <TextSymbolizer fontset-name='fontset-2' size='100' fill='dimgray' opacity='0.2' allow-overlap='true'>'Sylt'</TextSymbolizer>
-  WellKnownText: POINT(90.0 530.0)
-
-# copyright
-- Style: <TextSymbolizer fontset-name='fontset-0' size='12' fill='dimgray' orientation='90' allow-overlap='true'>'© OpenStreetMap contributors (ODbL)'</TextSymbolizer>
-  WellKnownText: POINT(10.0 297)
-
-# user files to upload
-# --------------------
-
-UserFiles:
-# 'track'
-#- mytrack.gpx
-# 'scale bar'
-#- scalebar-2000.geojson
-`
