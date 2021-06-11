@@ -17,7 +17,7 @@ verifyContentType verifies the media type for header field "Content-Type"
 */
 func verifyContentType(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 	mediaType := request.Header.Get("Content-Type")
-	if !strings.EqualsFold(pd.JSONAPIMediaType, mediaType) {
+	if !strings.EqualFold(pd.JSONAPIMediaType, mediaType) {
 		appendError(pmErrorList, "1001", "expected http header field = Content-Type: "+pd.JSONAPIMediaType+" but received: "+mediaType, "")
 	}
 }
@@ -28,7 +28,7 @@ verifyAccept verifies the media type for header field "Accept"
 func verifyAccept(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 
 	mediaType := request.Header.Get("Accept")
-	if !strings.EqualsFold(pd.JSONAPIMediaType, mediaType) {
+	if !strings.EqualFold(pd.JSONAPIMediaType, mediaType) {
 		appendError(pmErrorList, "1002", "expected http header field = Accept: "+pd.JSONAPIMediaType+" but received: "+mediaType, "")
 	}
 }
