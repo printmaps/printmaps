@@ -6,11 +6,15 @@ Description:
 - NN
 
 Releases:
-- 0.1.0 - 2018/06/07 : initial release
-- 0.2.0 - 2019/02/16 : function IsExistMapDirectory() added
+- v0.1.0 - 2018/06/07 : initial release
+- v0.2.0 - 2019/02/16 : function IsExistMapDirectory() added
+- v0.3.0 - 2021/06/12 : switch to modules, go 1.16.5
 
 Author:
 - Klaus Tockloth
+
+Remarks:
+- Lint: golangci-lint run
 */
 
 // Package pd (printmaps data) defeines general data structures, global constants, globals variables
@@ -164,7 +168,6 @@ type Mapstate struct {
 WriteMetadata writes the map meta data to a file
 */
 func WriteMetadata(pmData PrintmapsData) error {
-
 	// create directory if necessary
 	path := filepath.Join(PathWorkdir, PathMaps, pmData.Data.ID)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -188,7 +191,6 @@ func WriteMetadata(pmData PrintmapsData) error {
 ReadMetadata reads the map meta data
 */
 func ReadMetadata(pmData *PrintmapsData, id string) error {
-
 	file := filepath.Join(PathWorkdir, PathMaps, id, FileMetadata)
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -232,7 +234,6 @@ func ReadMetadata(pmData *PrintmapsData, id string) error {
 WriteMapstate writes (updates) the state of the map creation process
 */
 func WriteMapstate(pmState PrintmapsState) error {
-
 	// create directory if necessary
 	path := filepath.Join(PathWorkdir, PathMaps, pmState.Data.ID)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -256,7 +257,6 @@ func WriteMapstate(pmState PrintmapsState) error {
 ReadMapstate reads the state of the map creation process
 */
 func ReadMapstate(pmState *PrintmapsState, id string) error {
-
 	file := filepath.Join(PathWorkdir, PathMaps, id, FileMapstate)
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -277,7 +277,6 @@ func ReadMapstate(pmState *PrintmapsState, id string) error {
 CreateDirectories creates the necessary directories
 */
 func CreateDirectories() {
-
 	// create 'maps' directory if necessary
 	path := filepath.Join(PathWorkdir, PathMaps)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -299,7 +298,6 @@ func CreateDirectories() {
 IsExistMapDirectory verifies if map directory exist
 */
 func IsExistMapDirectory(mapID string) bool {
-
 	path := filepath.Join(PathWorkdir, PathMaps, mapID)
 	_, err := os.Stat(path)
 

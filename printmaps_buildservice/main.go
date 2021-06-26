@@ -17,12 +17,13 @@ Releases:
                        some changes are not compatible with initial release
 - 0.2.1 - 2018/12/10 : pdf meta data modification removed
                        refactoring (data.go as package)
+- 0.3.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017,2018 Klaus Tockloth
+- Copyright (c) 2017-2021 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -54,6 +55,7 @@ Contact (eMail):
 
 Remarks:
 - Cross compilation for Linux: env GOOS=linux GOARCH=amd64 go build -v
+- Lint: golangci-lint run
 
 Logging:
 - The log file is intended for reading by humans.
@@ -85,8 +87,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "0.2.1"
-	progDate    = "2018/12/10"
+	progVersion = "0.3.0"
+	progDate    = "2021/06/12"
 	progPurpose = "Printmaps Buildservice"
 	progInfo    = "Build service to build large printable maps."
 )
@@ -133,7 +135,6 @@ func init() {
 main starts this program
 */
 func main() {
-
 	var err error
 
 	configfile := "printmaps_buildservice.yaml"
@@ -257,7 +258,6 @@ ForeverLoop:
 buildMapMaster builds a map (master)
 */
 func buildMapMaster(nextOrder string, chanOut chan<- struct{}) {
-
 	// create temp directory
 	tempdir, err := ioutil.TempDir(pd.PathWorkdir, "printmaps_tempdir_")
 	if err != nil {
@@ -306,7 +306,6 @@ func buildMapMaster(nextOrder string, chanOut chan<- struct{}) {
 buildMap builds a map
 */
 func buildMap(tempdir string, order string) {
-
 	var pmData pd.PrintmapsData
 	var pmState pd.PrintmapsState
 	var bResult BuildResult
@@ -387,7 +386,6 @@ func buildMap(tempdir string, order string) {
 setBuildResult sets the result state of the map build process
 */
 func setBuildResult(pmState pd.PrintmapsState, bResult BuildResult) error {
-
 	// write (update) state (map build completed)
 	pmState.Data.Attributes.MapBuildCompleted = time.Now().Format(time.RFC3339)
 	pmState.Data.Attributes.MapBuildSuccessful = bResult.BuildSuccessful
@@ -404,7 +402,6 @@ func setBuildResult(pmState pd.PrintmapsState, bResult BuildResult) error {
 dumpPrintmapsData dumps (formats) a PrintmapsData object
 */
 func dumpPrintmapsData(pmData pd.PrintmapsData) string {
-
 	dump, err := json.MarshalIndent(pmData, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
@@ -418,7 +415,6 @@ func dumpPrintmapsData(pmData pd.PrintmapsData) string {
 dumpPrintmapsState dumps (formats) a PrintmapsState object
 */
 func dumpPrintmapsState(pmState pd.PrintmapsState) string {
-
 	dump, err := json.MarshalIndent(pmState, pd.IndentPrefix, pd.IndexString)
 	if err != nil {
 		message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
@@ -432,7 +428,6 @@ func dumpPrintmapsState(pmState pd.PrintmapsState) string {
 readOrder reads the map order (meta) data
 */
 func readOrder(pmData *pd.PrintmapsData, file string) error {
-
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		log.Printf("error <%v> at ioutil.ReadFile(), file = <%s>", err, file)
@@ -452,7 +447,6 @@ func readOrder(pmData *pd.PrintmapsData, file string) error {
 writeMetrics writes a simple metrics string into the log
 */
 func writeMetrics(tempdir string, order string, elapsed time.Duration) {
-
 	var pmData pd.PrintmapsData
 	var pmState pd.PrintmapsState
 

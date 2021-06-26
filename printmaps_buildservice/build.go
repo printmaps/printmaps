@@ -43,7 +43,6 @@ type MapnikData struct {
 buildMapnikMap builds the map
 */
 func buildMapnikMap(tempdir string, pmData pd.PrintmapsData, pmState *pd.PrintmapsState) error {
-
 	var err error
 
 	// find mapnik xml file
@@ -166,7 +165,6 @@ func buildMapnikMap(tempdir string, pmData pd.PrintmapsData, pmState *pd.Printma
 createUserMapnikXML creates an individual user mapnik xml file
 */
 func createUserMapnikXML(pmData pd.PrintmapsData, mapnikData MapnikData) (string, error) {
-
 	var err error
 
 	// find mapnik xml file
@@ -258,7 +256,6 @@ func createUserMapnikXML(pmData pd.PrintmapsData, mapnikData MapnikData) (string
 slurpFile slurps all lines of a text file into a slice of strings
 */
 func slurpFile(filename string) ([]string, error) {
-
 	var lines []string
 
 	file, err := os.Open(filename)
@@ -282,7 +279,6 @@ func slurpFile(filename string) ([]string, error) {
 createRasterMap creates a technical map with a 10 x 10 raster
 */
 func createRasterMap(lineBuffer []string, mapnikData MapnikData, pmData pd.PrintmapsData) []string {
-
 	rasterName := "raster10"
 	BoxProjection := mapnikData.BoxProjection
 
@@ -351,7 +347,6 @@ item object has filled elements:
 - WellKnownText
 */
 func createUserObjects(lineBuffer []string, pmData pd.PrintmapsData, mapnikData MapnikData, width float64, height float64) []string {
-
 	for index, userObject := range pmData.Data.Attributes.UserObjects {
 		if userObject.WellKnownText != "" {
 			// item object
@@ -403,7 +398,6 @@ func createUserObjects(lineBuffer []string, pmData pd.PrintmapsData, mapnikData 
 modifyFileReferences modifies all file references
 */
 func modifyFileReferences(lineBuffer []string, pmData pd.PrintmapsData) []string {
-
 	// special handling for file path
 	layerPath := filepath.Join(pd.PathWorkdir, pd.PathMaps, pmData.Data.ID)
 	filePathDefaultMarkers := config.Markersdir
@@ -479,7 +473,6 @@ bbox_wgs84=Box2d(7.60625878598,51.9317329752,7.64954121402,51.9694590903)
 layers=coast-poly,waterarea,buildings,highways
 */
 func parseMapnikData(commandOutput []byte, mapnikData *MapnikData) error {
-
 	lines := strings.Split(string(commandOutput), "\n")
 
 	i := -1
@@ -551,7 +544,6 @@ func parseMapnikData(commandOutput []byte, mapnikData *MapnikData) error {
 transformWellKnownText transforms the coordinates of an arbitrary well-know-text object
 */
 func transformWellKnownText(input string, mapnikData MapnikData, width float64, height float64) string {
-
 	output := ""
 	coordinateValue := ""
 	coordinateType := "x"

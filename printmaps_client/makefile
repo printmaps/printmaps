@@ -7,6 +7,7 @@
 # version 1.0.0 - 2017/06/02: initial release
 # version 1.1.0 - 2018/12/01: app renamed
 # version 1.2.0 - 2018/12/10: refactoring (data.go removed)
+# version 1.3.0 - 2021/06/12: darwin arm64 added
 
 appname := printmaps
 sources := $(wildcard *.go)
@@ -42,11 +43,15 @@ build/$(appname)_linux_arm64.tar.gz: $(sources)
 	$(call tar,linux,arm64)
 
 # ----- darwin (macOS) builds -----
-darwin: build/$(appname)_darwin_amd64.tar.gz
+darwin: build/$(appname)_darwin_amd64.tar.gz build/$(appname)_darwin_arm64.tar.gz
 
 build/$(appname)_darwin_amd64.tar.gz: $(sources)
 	$(call build,darwin,amd64,)
 	$(call tar,darwin,amd64)
+
+build/$(appname)_darwin_arm64.tar.gz: $(sources)
+	$(call build,darwin,arm64,)
+	$(call tar,darwin,arm64)
 
 # ----- windows builds -----
 windows: build/$(appname)_windows_386.zip  build/$(appname)_windows_amd64.zip

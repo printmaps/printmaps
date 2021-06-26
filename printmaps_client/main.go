@@ -35,12 +35,13 @@ Releases:
 - v0.5.3 - 2020/07/04 : typo in help text corrected
 - v0.5.4 - 2020/07/08 : minor correction
 - v0.6.0 - 2020/08/03 : template removed
+- v0.7.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017-2020 Klaus Tockloth
+- Copyright (c) 2017-2021 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -62,7 +63,7 @@ Contact (eMail):
 - printmaps.service@gmail.com
 
 Remarks:
-- NN
+- Lint: golangci-lint run
 
 Links:
 - http://www.printmaps-osm.de
@@ -99,8 +100,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.6.0"
-	progDate    = "2020/08/03"
+	progVersion = "v0.7.0"
+	progDate    = "2021/06/12"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -139,7 +140,6 @@ func init() {
 main starts this program
 */
 func main() {
-
 	_, progName = filepath.Split(progName)
 
 	if len(os.Args) == 1 {
@@ -246,7 +246,6 @@ func main() {
 checkMapDefinitionFile checks if the map definition file exists
 */
 func checkMapDefinitionFile() {
-
 	if _, err := os.Stat(mapDefinitionFile); os.IsNotExist(err) {
 		fmt.Printf("\nERROR - PRECONDITION FAILED:\n")
 		fmt.Printf("- the map definition file <%s> doesn't exists\n", mapDefinitionFile)
@@ -258,7 +257,6 @@ func checkMapDefinitionFile() {
 checkMapIDFile checks if the map id file exists
 */
 func checkMapIDFile() {
-
 	if _, err := os.Stat(mapIDFile); os.IsNotExist(err) {
 		fmt.Printf("\nERROR - PRECONDITION FAILED:\n")
 		fmt.Printf("- the map ID file <%s> doesn't exists\n", mapIDFile)
@@ -271,7 +269,6 @@ func checkMapIDFile() {
 printUsage prints the usage of this program
 */
 func printUsage() {
-
 	fmt.Printf("\nProgram:\n")
 	fmt.Printf("  Name         : %s\n", progName)
 	fmt.Printf("  Release      : %s - %s\n", progVersion, progDate)
@@ -336,7 +333,6 @@ func printUsage() {
 create creates a new map
 */
 func create() {
-
 	if mapID != "" {
 		fmt.Printf("\nnothing to do ... '%s' already exists\n", mapIDFile)
 		fmt.Printf("use '%s update' to update '%s'\n", progName, mapDefinitionFile)
@@ -396,7 +392,6 @@ func create() {
 update updates an existing map
 */
 func update() {
-
 	pmData := pd.PrintmapsData{}
 	pmData.Data.Type = "maps"
 	pmData.Data.ID = mapID
@@ -433,7 +428,6 @@ func update() {
 upload uploads an user supplied file
 */
 func upload(filename string) {
-
 	requestURL := mapConfig.ServiceURL + "upload/" + mapID
 
 	bodyBuf := &bytes.Buffer{}
@@ -481,7 +475,6 @@ func upload(filename string) {
 order places the map order
 */
 func order() {
-
 	requestURL := mapConfig.ServiceURL + "mapfile"
 	requestString := fmt.Sprintf("{\n    \"Data\": {\n        \"Type\": \"maps\",\n        \"ID\": \"%s\"\n    }\n}", mapID)
 
@@ -509,7 +502,6 @@ func order() {
 fetch fetches information concerning the map or the service
 */
 func fetch(action string) {
-
 	requestURL := ""
 	if action == "state" {
 		requestURL = mapConfig.ServiceURL + "mapstate/" + mapID
@@ -548,7 +540,6 @@ func fetch(action string) {
 download downloads the map
 */
 func download() {
-
 	filename := "printmaps.zip"
 	requestURL := mapConfig.ServiceURL + "mapfile/" + mapID
 
@@ -597,7 +588,6 @@ func download() {
 delete deletes a map (server data and local map ID file)
 */
 func delete() {
-
 	if mapID == "" {
 		fmt.Printf("\nnothing to do, map ID empty\n")
 		return
@@ -639,7 +629,6 @@ func delete() {
 printRequest prints the http response to stdout
 */
 func printRequest(req *http.Request, body bool) {
-
 	dump, err := httputil.DumpRequestOut(req, body)
 	if err != nil {
 		log.Fatalf("error <%v> at httputil.DumpRequestOut()", err)
@@ -659,7 +648,6 @@ func printRequest(req *http.Request, body bool) {
 printResponse prints the http response to stdout
 */
 func printResponse(resp *http.Response, body bool) {
-
 	dump, err := httputil.DumpResponse(resp, body)
 	if err != nil {
 		log.Fatalf("error <%v> at httputil.DumpResponse()", err)
@@ -679,7 +667,6 @@ func printResponse(resp *http.Response, body bool) {
 printSuccess prints the success / failsure of the request
 */
 func printSuccess(resp *http.Response, expectedStatus int) {
-
 	fmt.Printf("\naction result\n")
 	fmt.Printf("-------------\n")
 
@@ -697,7 +684,6 @@ func printSuccess(resp *http.Response, expectedStatus int) {
 unzip unzips downloaded map file
 */
 func unzip() {
-
 	archive := "printmaps.zip"
 	fmt.Printf("\nExtracting archive %s ...\n", archive)
 	zipReader, err := zip.OpenReader(archive)
@@ -739,7 +725,6 @@ func unzip() {
 passepartout calculates well-known-text passe-partout from base values
 */
 func passepartout() {
-
 	if len(os.Args) != 8 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s passepartout  width  height  left  top  right  bottom\n", progName)
@@ -819,7 +804,6 @@ func passepartout() {
 rectangle calculates well-known-text rectangle from base values
 */
 func rectangle() {
-
 	if len(os.Args) != 6 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s rectangle  x  y  width  height\n", progName)
@@ -865,7 +849,6 @@ func rectangle() {
 cropmarks calculates well-known-text crop marks from base values
 */
 func cropmarks() {
-
 	if len(os.Args) != 5 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s cropmarks  width  height  size\n", progName)
@@ -921,7 +904,6 @@ func cropmarks() {
 latlongrid calculates/creates a lat/lon grid and saves it as GeoJSON files
 */
 func latlongrid() {
-
 	if len(os.Args) != 7 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s latlongrid  latmin  lonmin  latmax  lonmax  distance\n", progName)
@@ -1040,7 +1022,6 @@ func latlongrid() {
 utmgrid calculates/creates a UTM grid and saves it as GeoJSON files
 */
 func utmgrid() {
-
 	if len(os.Args) != 5 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s utmgrid  utmmin  utmmax  distance\n", progName)
@@ -1179,7 +1160,6 @@ func utmgrid() {
 latlon2utm converts lat/lon to utm
 */
 func latlon2utm() {
-
 	if len(os.Args) != 4 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s latlon2utm  lat  lon\n", progName)
@@ -1214,7 +1194,6 @@ func latlon2utm() {
 utm2latlon converts utm to lat/lon
 */
 func utm2latlon() {
-
 	if len(os.Args) != 6 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s utm2latlon  zonenumber  hemisphere  easting  northing\n", progName)
@@ -1264,9 +1243,7 @@ func utm2latlon() {
 formatUTM formats UTM data as string
 */
 func formatUTM(easting float64, northing float64, zoneNumber int, zoneLetterOrHemisphere string) string {
-
 	result := fmt.Sprintf("%d %s %.0f %.0f", zoneNumber, zoneLetterOrHemisphere, easting, northing)
-
 	return result
 }
 
@@ -1274,9 +1251,7 @@ func formatUTM(easting float64, northing float64, zoneNumber int, zoneLetterOrHe
 formatLatLon formats lat/lon data as string
 */
 func formatLatLon(lat float64, lon float64) string {
-
 	result := fmt.Sprintf("%.5f %.5f", lat, lon)
-
 	return result
 }
 
@@ -1284,7 +1259,6 @@ func formatLatLon(lat float64, lon float64) string {
 latlonline creates a geographic line and saves it as GeoJSON files
 */
 func latlonline() {
-
 	if len(os.Args) != 8 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s latlonline  latstart  lonstart  latend  lonend  linelabel  filename\n", progName)
@@ -1349,7 +1323,6 @@ func latlonline() {
 utmline creates a geographic line and saves it as GeoJSON files
 */
 func utmline() {
-
 	if len(os.Args) != 6 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s utmline  utmstart  utmend  linelabel  filename\n", progName)
@@ -1439,7 +1412,6 @@ func utmline() {
 bearingline calculates/creates a geographic line and saves it as GeoJSON files
 */
 func bearingline() {
-
 	if len(os.Args) != 8 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s bearingline  lat  lon  angle  length  linelabel  filename\n", progName)
@@ -1512,7 +1484,6 @@ func bearingline() {
 runlua runs an user supplied lua script
 */
 func runlua() {
-
 	if len(os.Args) != 3 {
 		fmt.Printf("\nUsage:\n")
 		fmt.Printf("  %s runlua  filename\n", progName)
@@ -1540,7 +1511,6 @@ func runlua() {
 dumpData dumps an arbitrary data object
 */
 func dumpData(writer io.Writer, objectname string, object interface{}) {
-
 	if _, err := fmt.Fprintf(writer, "---------- %s ----------\n%s\n", objectname, spew.Sdump(object)); err != nil {
 		log.Fatalf("Fehler <%v> bei fmt.Fprintf", err)
 	}

@@ -11,7 +11,7 @@ Releases:
 - v0.1.2 - 2017/07/04 : problem with upload filename fixed
 - v0.2.0 - 2018/04/22 : support for full planet implemented
 - v0.3.0 - 2018/12/05 : service URL changed to beta2 (incompatible with beta)
-                       update data issue fixed
+                        update data issue fixed
 - v0.3.1 - 2018/12/05 : error check for attribute projection added
 - v0.3.2 - 2018/12/10 : refactoring (data.go as package)
 - v0.3.3 - 2019/01/22 : ID verification added (critical defect)
@@ -20,12 +20,14 @@ Releases:
 - v0.5.0 - 2020/05/20 : CORS support for javascript file uploads
 - v0.6.0 - 2020/06/20 : Post-as-Patch added
 - v0.7.0 - 2020/07/06 : Post-as-Delete added
+- v0.8.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5,
+                        Content-Type and Accept header verification modified
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017-2020 Klaus Tockloth
+- Copyright (c) 2017-2021 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -88,6 +90,7 @@ Contact (eMail):
 
 Remarks:
 - Cross compilation for Linux: env GOOS=linux GOARCH=amd64 go build -v
+- Lint: golangci-lint run
 
 Logging:
 - The log file is intended for reading by humans.
@@ -140,8 +143,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.7.0"
-	progDate    = "2020/07/06"
+	progVersion = "v0.8.0"
+	progDate    = "2021/06/12"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -188,7 +191,7 @@ type ConfigStyle struct {
 	Layers           string
 }
 
-// PrintmapsFeature decribes the capabilities of the service
+// PrintmapsFeature describes the capabilities of the service
 type PrintmapsFeature struct {
 	ConfigMapdata    ConfigMapdata
 	ConfigMapformats []ConfigMapformat
