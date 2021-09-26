@@ -35,7 +35,7 @@ Releases:
 - v0.5.3 - 2020/07/04 : typo in help text corrected
 - v0.5.4 - 2020/07/08 : minor correction
 - v0.6.0 - 2020/08/03 : template removed
-- v0.7.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5
+- v0.7.0 - 2021/06/12 : switch to modules, third-party libs updated,  go 1.16.5
 
 Author:
 - Klaus Tockloth
