@@ -19,7 +19,7 @@ import (
 )
 
 /*
-createMapOrder is a helper to create a (asynchronous) build order for the map defined in the meta data
+createMapOrder is a helper to create a (asynchronous) build order for the map defined in the meta data.
 */
 func createMapOrder(pmData pd.PrintmapsData) error {
 	file := filepath.Join(pd.PathWorkdir, pd.PathOrders, pmData.Data.ID) + ".json"
@@ -42,7 +42,7 @@ func createMapOrder(pmData pd.PrintmapsData) error {
 }
 
 /*
-readPolyfile reads the polygon file (osmosis poly(gon) format)
+readPolyfile reads the polygon file (osmosis poly(gon) format).
 Spec: http://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_File_Format
 0       none
 1       1
@@ -86,7 +86,7 @@ func readPolyfile(filename string, pPolygon *pip.Polygon) error {
 }
 
 /*
-slurpFile slurps all lines of a text file into a slice of strings
+slurpFile slurps all lines of a text file into a slice of strings.
 */
 func slurpFile(filename string) ([]string, error) {
 	var lines []string
@@ -109,7 +109,7 @@ func slurpFile(filename string) ([]string, error) {
 }
 
 /*
-readCapafile reads the capabilities file (json format)
+readCapafile reads the capabilities file (json format).
 */
 func readCapafile(filename string, pmFeature *PrintmapsFeature) error {
 	data, err := ioutil.ReadFile(filename)
@@ -128,7 +128,7 @@ func readCapafile(filename string, pmFeature *PrintmapsFeature) error {
 }
 
 /*
-runCommand runs a command / program
+runCommand runs a command / program.
 */
 func runCommand(command string) (commandExitStatus int, commandOutput []byte, err error) {
 	program := "/bin/bash"

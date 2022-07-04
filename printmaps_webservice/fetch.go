@@ -17,7 +17,7 @@ import (
 )
 
 /*
-fetchMetadata fetches the meta data for a given map ID
+fetchMetadata fetches the meta data for a given map ID.
 */
 func fetchMetadata(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	var pmErrorList pd.PrintmapsErrorList
@@ -33,7 +33,7 @@ func fetchMetadata(writer http.ResponseWriter, request *http.Request, params htt
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}
@@ -82,7 +82,7 @@ func fetchMetadata(writer http.ResponseWriter, request *http.Request, params htt
 }
 
 /*
-fetchMapstate fetches the current state of the map creation process
+fetchMapstate fetches the current state of the map creation process.
 */
 func fetchMapstate(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	var pmErrorList pd.PrintmapsErrorList
@@ -98,7 +98,7 @@ func fetchMapstate(writer http.ResponseWriter, request *http.Request, params htt
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}
@@ -147,7 +147,7 @@ func fetchMapstate(writer http.ResponseWriter, request *http.Request, params htt
 }
 
 /*
-fetchMapfile send the map file with the give map ID to the client
+fetchMapfile send the map file with the give map ID to the client.
 */
 func fetchMapfile(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	var pmErrorList pd.PrintmapsErrorList
@@ -164,7 +164,7 @@ func fetchMapfile(writer http.ResponseWriter, request *http.Request, params http
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}
@@ -233,4 +233,76 @@ func fetchMapfile(writer http.ResponseWriter, request *http.Request, params http
 		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write(content)
 	}
+}
+
+/*
+fetchUIData fetches the UI data (stored as file) for a given map ID.
+*/
+func fetchUIData(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	var pmErrorList pd.PrintmapsErrorList
+	var data []byte
+	var err error
+
+	id := params.ByName("id")
+
+	// verify ID
+	_, err = uuid.FromString(id)
+	if err != nil {
+		appendError(&pmErrorList, "4001", "error = "+err.Error(), "")
+	}
+
+	// map directory must exist
+	if len(pmErrorList.Errors) == 0 {
+		if !pd.IsExistMapDirectory(id) {
+			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
+		}
+	}
+
+	if len(pmErrorList.Errors) == 0 {
+		file := filepath.Join(pd.PathWorkdir, pd.PathMaps, id, id+".ui")
+		isFileExists, _ := fileExists(file)
+		if isFileExists {
+			data, err = os.ReadFile(file)
+			if err != nil {
+				message := fmt.Sprintf("error at os.ReadFile(), file = <%s.ui>", id)
+				http.Error(writer, message, http.StatusInternalServerError)
+				log.Printf("Response %d - %s - error = <%v>", http.StatusInternalServerError, message, err)
+				return
+			}
+		}
+	}
+
+	if len(pmErrorList.Errors) == 0 {
+		writer.Header().Set("Content-Type", "application/octet-stream")
+		writer.Header().Set("Content-Length", strconv.Itoa(len(data)))
+		writer.WriteHeader(http.StatusOK)
+		writer.Write(data)
+	} else {
+		// request not ok, response with error list
+		content, err := json.MarshalIndent(pmErrorList, pd.IndentPrefix, pd.IndexString)
+		if err != nil {
+			message := fmt.Sprintf("error <%v> at json.MarshalIndent()", err)
+			http.Error(writer, message, http.StatusInternalServerError)
+			log.Printf("Response %d - %s", http.StatusInternalServerError, message)
+			return
+		}
+
+		writer.Header().Set("Content-Type", pd.JSONAPIMediaType)
+		writer.Header().Set("Content-Length", strconv.Itoa(len(content)))
+		writer.WriteHeader(http.StatusBadRequest)
+		writer.Write(content)
+	}
+}
+
+/*
+fileExists checks if given file exists.
+*/
+func fileExists(filename string) (bool, error) {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return !info.IsDir(), nil
 }

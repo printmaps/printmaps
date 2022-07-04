@@ -17,7 +17,7 @@ import (
 )
 
 /*
-deleteMap deletes all data for a given map ID
+deleteMap deletes all data for a given map ID.
 */
 func deleteMap(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	var pmData pd.PrintmapsData
@@ -33,7 +33,7 @@ func deleteMap(writer http.ResponseWriter, request *http.Request, params httprou
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}

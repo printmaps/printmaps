@@ -15,7 +15,7 @@ import (
 )
 
 /*
-runCommand runs a command / program
+runCommand runs a command / program.
 */
 func runCommand(command string) (commandExitStatus int, commandOutput []byte, err error) {
 
@@ -55,7 +55,7 @@ func runCommand(command string) (commandExitStatus int, commandOutput []byte, er
 }
 
 /*
-nextBuildOrder returns the name of the oldest build order file
+nextBuildOrder returns the name of the oldest build order file.
 */
 func nextBuildOrder() string {
 
@@ -72,7 +72,7 @@ func nextBuildOrder() string {
 	sort.Slice(files, func(i, j int) bool { return files[i].ModTime().Unix() < files[j].ModTime().Unix() })
 
 	for _, fileInfo := range files {
-		if fileInfo.IsDir() == false {
+		if !fileInfo.IsDir() {
 			return fileInfo.Name()
 		}
 	}

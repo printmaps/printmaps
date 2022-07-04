@@ -22,12 +22,13 @@ Releases:
 - v0.7.0 - 2020/07/06 : Post-as-Delete added
 - v0.8.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5,
                         Content-Type and Accept header verification modified
+- v0.9.0 - 2022/06/12 : Get 'uidata' added, compiled with go 1.18.3, some non-functional modifications
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017-2021 Klaus Tockloth
+- Copyright (c) 2017-2022 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -90,7 +91,7 @@ Contact (eMail):
 
 Remarks:
 - Cross compilation for Linux: env GOOS=linux GOARCH=amd64 go build -v
-- Lint: golangci-lint run
+- Lint: golangci-lint run --no-config --enable gocritic
 
 Logging:
 - The log file is intended for reading by humans.
@@ -143,8 +144,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.8.0"
-	progDate    = "2021/06/12"
+	progVersion = "v0.9.0"
+	progDate    = "2022/06/12"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )
@@ -213,7 +214,7 @@ func init() {
 }
 
 /*
-main starts this program
+main starts this program.
 */
 func main() {
 	configfile := "printmaps_webservice.yaml"
@@ -301,12 +302,13 @@ func main() {
 
 	router := httprouter.New()
 
-	if config.Maintenancemode == false {
+	if !config.Maintenancemode {
 		// production mode
 		// GET (fetch resource)
 		router.GET("/api/beta2/maps/metadata/:id", middlewareHandler(fetchMetadata))
 		router.GET("/api/beta2/maps/mapstate/:id", middlewareHandler(fetchMapstate))
 		router.GET("/api/beta2/maps/mapfile/:id", middlewareHandler(fetchMapfile))
+		router.GET("/api/beta2/maps/uidata/:id", middlewareHandler(fetchUIData))
 
 		// POST (create resource)
 		router.POST("/api/beta2/maps/metadata", middlewareHandler(createMetadata))
@@ -334,7 +336,7 @@ func main() {
 	}
 
 	// subscribe to signals
-	stopChan := make(chan os.Signal)
+	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, syscall.SIGINT)  // kill -SIGINT pid -> interrupt
 	signal.Notify(stopChan, syscall.SIGTERM) // kill -SIGTERM pid -> terminated
 
@@ -363,7 +365,7 @@ func main() {
 }
 
 /*
-middlewareHandler is a wrapper to catch all client requests
+middlewareHandler is a wrapper to catch all client requests.
 */
 func middlewareHandler(nextFunction httprouter.Handle) httprouter.Handle {
 	return func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
@@ -392,7 +394,7 @@ func middlewareHandler(nextFunction httprouter.Handle) httprouter.Handle {
 }
 
 /*
-dumpRequest dumps a http request
+dumpRequest dumps a http request.
 */
 func dumpRequest(request *http.Request) string {
 	dump, err := httputil.DumpRequest(request, true)
@@ -403,7 +405,7 @@ func dumpRequest(request *http.Request) string {
 }
 
 /*
-dumpResponse dumps a (recorded) http response
+dumpResponse dumps a (recorded) http response.
 */
 func dumpResponse(responseRecorder *httptest.ResponseRecorder) string {
 	dump := fmt.Sprintf("%v (%s)\n", responseRecorder.Code, http.StatusText(responseRecorder.Code))
@@ -415,7 +417,7 @@ func dumpResponse(responseRecorder *httptest.ResponseRecorder) string {
 }
 
 /*
-showMaintenance shows the maintenance page and sends status code 503 (Service Unavailable)
+showMaintenance shows the maintenance page and sends status code 503 (Service Unavailable).
 */
 func showMaintenance(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	content, err := ioutil.ReadFile(config.Maintenancefile)

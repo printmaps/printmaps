@@ -17,7 +17,7 @@ import (
 )
 
 /*
-createMetadata creates the meta data for a new map
+createMetadata creates the meta data for a new map.
 */
 func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	var pmErrorList pd.PrintmapsErrorList
@@ -93,7 +93,7 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 }
 
 /*
-createMapfile creates a (asynchronous) build order for the map defined in the metadata
+createMapfile creates a (asynchronous) build order for the map defined in the metadata.
 */
 func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	var pmErrorList pd.PrintmapsErrorList
@@ -120,7 +120,7 @@ func createMapfile(writer http.ResponseWriter, request *http.Request, _ httprout
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}

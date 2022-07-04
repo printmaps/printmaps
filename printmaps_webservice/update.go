@@ -18,7 +18,7 @@ import (
 )
 
 /*
-updateMetadata updates (patches) the meta data for a given map ID
+updateMetadata updates (patches) the meta data for a given map ID.
 */
 func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	var pmErrorList pd.PrintmapsErrorList
@@ -52,7 +52,7 @@ func updateMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}

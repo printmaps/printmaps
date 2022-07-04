@@ -14,7 +14,7 @@ import (
 )
 
 /*
-revealCapaService reveals the capabilities of this service
+revealCapaService reveals the capabilities of this service.
 */
 func revealCapaService(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	content, err := json.MarshalIndent(pmFeature, pd.IndentPrefix, pd.IndexString)
@@ -32,7 +32,7 @@ func revealCapaService(writer http.ResponseWriter, request *http.Request, _ http
 }
 
 /*
-revealCapaMapdata reveals the capabilities of the mapdata
+revealCapaMapdata reveals the capabilities of the mapdata.
 */
 func revealCapaMapdata(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	content, err := json.MarshalIndent(pPolygon, pd.IndentPrefix, pd.IndexString)

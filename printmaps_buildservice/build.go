@@ -40,7 +40,7 @@ type MapnikData struct {
 }
 
 /*
-buildMapnikMap builds the map
+buildMapnikMap builds the map.
 */
 func buildMapnikMap(tempdir string, pmData pd.PrintmapsData, pmState *pd.PrintmapsState) error {
 	var err error
@@ -111,7 +111,7 @@ func buildMapnikMap(tempdir string, pmData pd.PrintmapsData, pmState *pd.Printma
 		log.Printf("unexpected error <%s> in buildMapnikMap()", err)
 		return err
 	}
-	if config.Testmode == false {
+	if !config.Testmode {
 		defer func() {
 			if err = os.Remove(mapnikXML); err != nil {
 				log.Printf("unexpected error <%s> at os.Remove(), file = <%s>", err, mapnikXML)
@@ -162,7 +162,7 @@ func buildMapnikMap(tempdir string, pmData pd.PrintmapsData, pmState *pd.Printma
 }
 
 /*
-createUserMapnikXML creates an individual user mapnik xml file
+createUserMapnikXML creates an individual user mapnik xml file.
 */
 func createUserMapnikXML(pmData pd.PrintmapsData, mapnikData MapnikData) (string, error) {
 	var err error
@@ -223,7 +223,7 @@ func createUserMapnikXML(pmData pd.PrintmapsData, mapnikData MapnikData) (string
 	writer := bufio.NewWriter(file)
 
 	for _, mapnikLine := range mapnikLines {
-		if strings.Index(mapnikLine, "</Map>") != -1 {
+		if strings.Contains(mapnikLine, "</Map>") {
 			// insert xml rendering instructions for user defined data elements
 			for _, includeLine := range includeLines {
 				_, err = fmt.Fprintf(writer, "%s", includeLine)
@@ -253,7 +253,7 @@ func createUserMapnikXML(pmData pd.PrintmapsData, mapnikData MapnikData) (string
 }
 
 /*
-slurpFile slurps all lines of a text file into a slice of strings
+slurpFile slurps all lines of a text file into a slice of strings.
 */
 func slurpFile(filename string) ([]string, error) {
 	var lines []string
@@ -276,7 +276,7 @@ func slurpFile(filename string) ([]string, error) {
 }
 
 /*
-createRasterMap creates a technical map with a 10 x 10 raster
+createRasterMap creates a technical map with a 10 x 10 raster.
 */
 func createRasterMap(lineBuffer []string, mapnikData MapnikData, pmData pd.PrintmapsData) []string {
 	rasterName := "raster10"
@@ -322,7 +322,7 @@ func createRasterMap(lineBuffer []string, mapnikData MapnikData, pmData pd.Print
 }
 
 /*
-createUserObjects creates the user defined data elementes
+createUserObjects creates the user defined data elementes.
 
 OGR:
   <Parameter name="type">ogr</Parameter>
@@ -395,7 +395,7 @@ func createUserObjects(lineBuffer []string, pmData pd.PrintmapsData, mapnikData 
 }
 
 /*
-modifyFileReferences modifies all file references
+modifyFileReferences modifies all file references.
 */
 func modifyFileReferences(lineBuffer []string, pmData pd.PrintmapsData) []string {
 	// special handling for file path
@@ -463,7 +463,7 @@ func modifyFileReferences(lineBuffer []string, pmData pd.PrintmapsData) []string
 }
 
 /*
-parseMapnikData parses the output from the mapnik driver, example:
+parseMapnikData parses the output from the mapnik driver. Example:
 nik4-printmaps.py --debug --scale 10000 --size 297 420 --ppi 300 --center 7.6279 51.9506 mapnik.xml muenster.png
 scale=1.37348285369
 scale_factor=3.30760749724
@@ -478,7 +478,7 @@ func parseMapnikData(commandOutput []byte, mapnikData *MapnikData) error {
 	i := -1
 	for index, line := range lines {
 		// find start line
-		if strings.Index(line, "scale=") != -1 {
+		if strings.Contains(line, "scale=") {
 			i = index
 			break
 		}
@@ -541,7 +541,7 @@ func parseMapnikData(commandOutput []byte, mapnikData *MapnikData) error {
 }
 
 /*
-transformWellKnownText transforms the coordinates of an arbitrary well-know-text object
+transformWellKnownText transforms the coordinates of an arbitrary well-know-text object.
 */
 func transformWellKnownText(input string, mapnikData MapnikData, width float64, height float64) string {
 	output := ""

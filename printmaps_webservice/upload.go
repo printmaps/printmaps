@@ -20,7 +20,7 @@ import (
 )
 
 /*
-uploadUserdata allows the upload of an user data file (e.g. gpx file)
+uploadUserdata allows the upload of an user data file (e.g. gpx file).
 */
 func uploadUserdata(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	var pmData pd.PrintmapsData
@@ -36,7 +36,7 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 
 	// map directory must exist
 	if len(pmErrorList.Errors) == 0 {
-		if pd.IsExistMapDirectory(id) == false {
+		if !pd.IsExistMapDirectory(id) {
 			appendError(&pmErrorList, "4002", "requested ID not found: "+id, id)
 		}
 	}
@@ -134,7 +134,7 @@ func uploadUserdata(writer http.ResponseWriter, request *http.Request, params ht
 }
 
 /*
-verifyUploadedFile verifies if a file is 'secure' (using linux file command)
+verifyUploadedFile verifies if a file is 'secure' (using linux file command).
 */
 func verifyUploadedFile(filename string) error {
 	command := fmt.Sprintf("file %s", filename)
@@ -149,7 +149,7 @@ func verifyUploadedFile(filename string) error {
 		message := fmt.Sprintf("error <%v> at runCommand()", err)
 		return errors.New(message)
 	}
-	if strings.Index(string(commandOutput), "executable") != -1 {
+	if strings.Contains(string(commandOutput), "executable") {
 		return errors.New(strings.TrimSpace(string(commandOutput)))
 	}
 	return nil

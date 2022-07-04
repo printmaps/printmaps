@@ -13,7 +13,7 @@ import (
 )
 
 /*
-verifyContentType verifies the media type for header field "Content-Type"
+verifyContentType verifies the media type for header field "Content-Type".
 */
 func verifyContentType(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 	mediaType := request.Header.Get("Content-Type")
@@ -23,7 +23,7 @@ func verifyContentType(request *http.Request, pmErrorList *pd.PrintmapsErrorList
 }
 
 /*
-verifyAccept verifies the media type for header field "Accept"
+verifyAccept verifies the media type for header field "Accept".
 */
 func verifyAccept(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 	mediaType := request.Header.Get("Accept")
@@ -33,7 +33,7 @@ func verifyAccept(request *http.Request, pmErrorList *pd.PrintmapsErrorList) {
 }
 
 /*
-verifyMetadata verifies the map meta data
+verifyMetadata verifies the map meta data.
 */
 func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList) {
 	var message string
@@ -52,7 +52,7 @@ func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList)
 				break
 			}
 		}
-		if found == false {
+		if !found {
 			var validStyles []string
 			for _, style := range pmFeature.ConfigStyles {
 				validStyles = append(validStyles, style.Name)
@@ -73,7 +73,7 @@ func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList)
 				break
 			}
 		}
-		if found == false {
+		if !found {
 			var validFormats []string
 			for _, mapformat := range pmFeature.ConfigMapformats {
 				validFormats = append(validFormats, mapformat.Type)
@@ -141,7 +141,7 @@ func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList)
 			pP.X = pmData.Data.Attributes.Longitude
 			pP.Y = pmData.Data.Attributes.Latitude
 			found = pip.PointInPolygon(pP, pPolygon)
-			if found == false {
+			if !found {
 				appendError(pmErrorList, "3013", "no data available for the center position of the map", pmData.Data.ID)
 			}
 		}
@@ -149,7 +149,7 @@ func verifyMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList)
 }
 
 /*
-verifyRequiredMetadata verifies (only) the existence of the required map meta data
+verifyRequiredMetadata verifies (only) the existence of the required map meta data.
 */
 func verifyRequiredMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsErrorList) {
 	var missingAttributes []string
@@ -188,7 +188,7 @@ func verifyRequiredMetadata(pmData pd.PrintmapsData, pmErrorList *pd.PrintmapsEr
 }
 
 /*
-appendError append an error entry to the error list
+appendError append an error entry to the error list.
 */
 func appendError(pmErrorList *pd.PrintmapsErrorList, code string, detail string, mapID string) {
 	var jaError pd.PrintmapsError
