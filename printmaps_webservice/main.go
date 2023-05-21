@@ -23,6 +23,7 @@ Releases:
 - v0.8.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5,
                         Content-Type and Accept header verification modified
 - v0.9.0 - 2022/06/12 : Get 'uidata' added, compiled with go 1.18.3, some non-functional modifications
+- v0.10.0 - 2023/05/21 : log client IP (in order to block malicious clients), compiled with go 1.20.4
 
 Author:
 - Klaus Tockloth
@@ -92,6 +93,7 @@ Contact (eMail):
 Remarks:
 - Cross compilation for Linux: env GOOS=linux GOARCH=amd64 go build -v
 - Lint: golangci-lint run --no-config --enable gocritic
+- Vulnerability detection: govulncheck ./...
 
 Logging:
 - The log file is intended for reading by humans.
@@ -144,8 +146,8 @@ var config Config
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.9.0"
-	progDate    = "2022/06/12"
+	progVersion = "v0.10.0"
+	progDate    = "2023/05/21"
 	progPurpose = "Printmaps Webservice"
 	progInfo    = "Webservice to build large printable maps based on OSM data."
 )

@@ -27,6 +27,9 @@ func createMetadata(writer http.ResponseWriter, request *http.Request, _ httprou
 	verifyContentType(request, &pmErrorList)
 	verifyAccept(request, &pmErrorList)
 
+	// log client IP (in order to block malicious clients)
+	log.Printf("createMetadata(): RemoteAddr %s", request.RemoteAddr)
+
 	// process body
 	if err := json.NewDecoder(request.Body).Decode(&pmData); err != nil {
 		appendError(&pmErrorList, "2001", "error = "+err.Error(), "")
