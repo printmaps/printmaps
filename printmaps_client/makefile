@@ -8,11 +8,12 @@
 # version 1.1.0 - 2018/12/01: app renamed
 # version 1.2.0 - 2018/12/10: refactoring (data.go removed)
 # version 1.3.0 - 2021/06/12: darwin arm64 added
+# version 1.4.0 - 2025/01/04: only amd64 + arm64
 
 appname := printmaps
 sources := $(wildcard *.go)
 
-build = GOOS=$(1) GOARCH=$(2) go build -o build/$(appname)$(3)
+build = GOOS=$(1) GOARCH=$(2) go build -v -o build/$(appname)$(3)
 tar = cd build && tar -cvzf $(appname)_$(1)_$(2).tar.gz $(appname)$(3) && rm $(appname)$(3)
 zip = cd build && zip $(appname)_$(1)_$(2).zip $(appname)$(3) && rm $(appname)$(3)
 
@@ -24,19 +25,11 @@ clean:
 	rm -rf build/
 
 # ----- linux builds -----
-linux: build/$(appname)_linux_arm.tar.gz build/$(appname)_linux_arm64.tar.gz build/$(appname)_linux_386.tar.gz build/$(appname)_linux_amd64.tar.gz
-
-build/$(appname)_linux_386.tar.gz: $(sources)
-	$(call build,linux,386,)
-	$(call tar,linux,386)
+linux: build/$(appname)_linux_amd64.tar.gz build/$(appname)_linux_arm64.tar.gz 
 
 build/$(appname)_linux_amd64.tar.gz: $(sources)
 	$(call build,linux,amd64,)
 	$(call tar,linux,amd64)
-
-build/$(appname)_linux_arm.tar.gz: $(sources)
-	$(call build,linux,arm,)
-	$(call tar,linux,arm)
 
 build/$(appname)_linux_arm64.tar.gz: $(sources)
 	$(call build,linux,arm64,)
@@ -54,12 +47,12 @@ build/$(appname)_darwin_arm64.tar.gz: $(sources)
 	$(call tar,darwin,arm64)
 
 # ----- windows builds -----
-windows: build/$(appname)_windows_386.zip  build/$(appname)_windows_amd64.zip
-
-build/$(appname)_windows_386.zip: $(sources)
-	$(call build,windows,386,.exe)
-	$(call zip,windows,386,.exe)
+windows: build/$(appname)_windows_amd64.zip build/$(appname)_windows_arm64.zip
 
 build/$(appname)_windows_amd64.zip: $(sources)
 	$(call build,windows,amd64,.exe)
 	$(call zip,windows,amd64,.exe)
+
+build/$(appname)_windows_arm64.zip: $(sources)
+	$(call build,windows,arm64,.exe)
+	$(call zip,windows,arm64,.exe)

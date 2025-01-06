@@ -35,13 +35,14 @@ Releases:
 - v0.5.3 - 2020/07/04 : typo in help text corrected
 - v0.5.4 - 2020/07/08 : minor correction
 - v0.6.0 - 2020/08/03 : template removed
-- v0.7.0 - 2021/06/12 : switch to modules, third-party libs updated,  go 1.16.5
+- v0.7.0 - 2021/06/12 : switch to modules, third-party libs updated, go 1.16.5
+- v0.8.0 - 2025/01/04 : libs updated, go 1.23.4
 
 Author:
 - Klaus Tockloth
 
 Copyright and license:
-- Copyright (c) 2017-2021 Klaus Tockloth
+- Copyright (c) 2017-2025 Klaus Tockloth
 - MIT license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -63,7 +64,8 @@ Contact (eMail):
 - printmaps.service@gmail.com
 
 Remarks:
-- Lint: golangci-lint run
+- Lint: golangci-lint run --no-config --enable gocritic
+- Vulnerability detection: govulncheck ./...
 
 Links:
 - http://www.printmaps-osm.de
@@ -77,7 +79,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -100,8 +101,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.7.0"
-	progDate    = "2021/06/12"
+	progVersion = "v0.8.0"
+	progDate    = "2025/01/04"
 	progPurpose = "Printmaps Command Line Interface Client"
 	progInfo    = "Creates large-sized maps in print quality."
 )
@@ -148,9 +149,9 @@ func main() {
 
 	// read map definition
 	if _, err := os.Stat(mapDefinitionFile); err == nil {
-		source, err := ioutil.ReadFile(mapDefinitionFile)
+		source, err := os.ReadFile(mapDefinitionFile)
 		if err != nil {
-			log.Fatalf("error <%v> at ioutil.ReadFile(), file = <%s>", err, mapDefinitionFile)
+			log.Fatalf("error <%v> at os.ReadFile(), file = <%s>", err, mapDefinitionFile)
 		}
 		err = yaml.Unmarshal(source, &mapConfig)
 		if err != nil {
@@ -164,9 +165,9 @@ func main() {
 
 	// read map id
 	if _, err := os.Stat(mapIDFile); err == nil {
-		filedata, err := ioutil.ReadFile(mapIDFile)
+		filedata, err := os.ReadFile(mapIDFile)
 		if err != nil {
-			log.Fatalf("error <%v> at ioutil.ReadFile(), file = <%s>", err, mapIDFile)
+			log.Fatalf("error <%v> at os.ReadFile(), file = <%s>", err, mapIDFile)
 		}
 		mapID = string(filedata)
 	}
@@ -371,9 +372,9 @@ func create() {
 	printSuccess(resp, http.StatusCreated)
 
 	// write map id to file
-	data, err = ioutil.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("error <%v> at ioutil.ReadAll()", err)
+		log.Fatalf("error <%v> at io.ReadAll()", err) // nolint
 	}
 
 	pmDataResponse := pd.PrintmapsData{}
@@ -382,9 +383,9 @@ func create() {
 		log.Fatalf("error <%v> at json.Unmarshal()", err)
 	}
 
-	err = ioutil.WriteFile(mapIDFile, []byte(pmDataResponse.Data.ID), 0666)
+	err = os.WriteFile(mapIDFile, []byte(pmDataResponse.Data.ID), 0666)
 	if err != nil {
-		log.Fatalf("error <%v> at ioutil.WriteFile()", err)
+		log.Fatalf("error <%v> at os.WriteFile()", err)
 	}
 }
 
@@ -572,7 +573,7 @@ func download() {
 
 	file, err := os.Create(filename)
 	if err != nil {
-		log.Fatalf("error <%v> at os.Create(), file = <%s>", err, filename)
+		log.Fatalf("error <%v> at os.Create(), file = <%s>", err, filename) // nolint
 	}
 	defer file.Close()
 
@@ -620,7 +621,7 @@ func delete() {
 	fmt.Printf("\nremoving local map ID file '%s' ...\n", mapIDFile)
 	err = os.Remove(mapIDFile)
 	if err != nil {
-		log.Fatalf("error <%v> at os.Remove()", mapIDFile)
+		log.Fatalf("error <%v> at os.Remove()", mapIDFile) // nolint
 	}
 	fmt.Printf("done\n")
 }
@@ -638,7 +639,7 @@ func printRequest(req *http.Request, body bool) {
 	fmt.Printf("------------\n")
 	fmt.Printf("\n%s", dump)
 
-	if body == false {
+	if !body {
 		fmt.Printf("<request body omitted>\n")
 	}
 	fmt.Printf("\n")
@@ -657,7 +658,7 @@ func printResponse(resp *http.Response, body bool) {
 	fmt.Printf("-------------\n")
 	fmt.Printf("\n%s", dump)
 
-	if body == false {
+	if !body {
 		fmt.Printf("<response body omitted>\n")
 	}
 	fmt.Printf("\n")
@@ -703,7 +704,7 @@ func unzip() {
 			fmt.Println("  Directory created:", extractedFilePath)
 			err = os.MkdirAll(extractedFilePath, file.Mode())
 			if err != nil {
-				log.Fatalf("error <%v> at os.MkdirAll(), path = <%s>", err, extractedFilePath)
+				log.Fatalf("error <%v> at os.MkdirAll(), path = <%s>", err, extractedFilePath) // nolint
 			}
 		} else {
 			fmt.Println("  File extracted:", file.Name)
@@ -984,8 +985,8 @@ func latlongrid() {
 
 	// write data ([]byte) to file
 	filename := "latgrid.geojson"
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("\nerror <%v> at ioutil.WriteFile(); file = <%v>\n", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("\nerror <%v> at os.WriteFile(); file = <%v>\n", err, filename)
 	}
 
 	fmt.Printf("\nlatitude coordinate grid lines: %s\n", filename)
@@ -1011,8 +1012,8 @@ func latlongrid() {
 
 	// write data ([]byte) to file
 	filename = "longrid.geojson"
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("\nerror <%v> at ioutil.WriteFile(); file = <%v>\n", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("\nerror <%v> at os.WriteFile(); file = <%v>\n", err, filename)
 	}
 
 	fmt.Printf("longitude coordinate grid lines: %s\n", filename)
@@ -1114,8 +1115,8 @@ func utmgrid() {
 
 	// write data ([]byte) to file
 	filename := fmt.Sprintf("utmlatgrid%.0f.geojson", gridDistance)
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("error <%v> at ioutil.WriteFile(); file = <%v>", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("error <%v> at os.WriteFile(); file = <%v>", err, filename)
 	}
 
 	fmt.Printf("\nutm latitude (horizontal) coordinate grid lines: %s\n", filename)
@@ -1149,8 +1150,8 @@ func utmgrid() {
 
 	// write data ([]byte) to file
 	filename = fmt.Sprintf("utmlongrid%.0f.geojson", gridDistance)
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("error <%v> at ioutil.WriteFile(); file = <%v>", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("error <%v> at os.WriteFile(); file = <%v>", err, filename)
 	}
 
 	fmt.Printf("utm longitude (vertical) coordinate grid lines: %s\n", filename)
@@ -1310,8 +1311,8 @@ func latlonline() {
 
 	// write data ([]byte) to file
 	filename := os.Args[7] + ".geojson"
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("\nerror <%v> at ioutil.WriteFile(); file = <%v>\n", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("\nerror <%v> at os.WriteFile(); file = <%v>\n", err, filename)
 	}
 
 	fmt.Printf("\ngeographic line (filename): %s\n", filename)
@@ -1366,7 +1367,7 @@ func utmline() {
 	label := os.Args[4]
 
 	// verify input data
-	if utmStartZoneNumber != utmStartZoneNumber {
+	if utmStartZoneNumber != utmEndZoneNumber {
 		log.Fatalf("\nerror: utm zone numbers (%d / %d) not identical\n", utmStartZoneNumber, utmEndZoneNumber)
 	}
 	if utmStartZoneLetter != utmEndZoneLetter {
@@ -1399,8 +1400,8 @@ func utmline() {
 
 	// write data ([]byte) to file
 	filename := os.Args[5] + ".geojson"
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("\nerror <%v> at ioutil.WriteFile(); file = <%v>\n", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("\nerror <%v> at os.WriteFile(); file = <%v>\n", err, filename)
 	}
 
 	fmt.Printf("\ngeographic line (filename): %s\n", filename)
@@ -1471,8 +1472,8 @@ func bearingline() {
 
 	// write data ([]byte) to file
 	filename := os.Args[7] + ".geojson"
-	if err := ioutil.WriteFile(filename, dataJSON, 0666); err != nil {
-		log.Fatalf("\nerror <%v> at ioutil.WriteFile(); file = <%v>\n", err, filename)
+	if err := os.WriteFile(filename, dataJSON, 0666); err != nil {
+		log.Fatalf("\nerror <%v> at os.WriteFile(); file = <%v>\n", err, filename)
 	}
 
 	fmt.Printf("\ngeographic line (filename): %s\n", filename)
@@ -1503,14 +1504,14 @@ func runlua() {
 	luaScript := os.Args[2]
 	fmt.Printf("\nRunning '%s' with script '%s' ...\n", lua.LuaVersion, luaScript)
 	if err := L.DoFile(luaScript); err != nil {
-		log.Fatalf("\nerror <%v> at L.DoFile(); file = <%v>", err, luaScript)
+		log.Fatalf("\nerror <%v> at L.DoFile(); file = <%v>", err, luaScript) // nolint
 	}
 }
 
 /*
 dumpData dumps an arbitrary data object
 */
-func dumpData(writer io.Writer, objectname string, object interface{}) {
+func dumpData(writer io.Writer, objectname string, object interface{}) { // nolint
 	if _, err := fmt.Fprintf(writer, "---------- %s ----------\n%s\n", objectname, spew.Sdump(object)); err != nil {
 		log.Fatalf("Fehler <%v> bei fmt.Fprintf", err)
 	}
